@@ -277,6 +277,7 @@ void CreateScene() {
 
 		// Load in the meshes
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
+		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("Full.obj");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
@@ -353,34 +354,41 @@ void CreateScene() {
 		}
 
 		// Create some lights for our scene
-		scene->Lights.resize(3);
+		scene->Lights.resize(1);
 		scene->Lights[0].Position = glm::vec3(0.0f, 1.0f, 3.0f);
 		scene->Lights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[0].Range = 100.0f;
 
-		scene->Lights[1].Position = glm::vec3(1.0f, 0.0f, 3.0f);
+		/*scene->Lights[1].Position = glm::vec3(1.0f, 0.0f, 3.0f);
 		scene->Lights[1].Color = glm::vec3(0.2f, 0.8f, 0.1f);
 
 		scene->Lights[2].Position = glm::vec3(0.0f, 1.0f, 3.0f);
-		scene->Lights[2].Color = glm::vec3(1.0f, 0.2f, 0.1f);
+		scene->Lights[2].Color = glm::vec3(1.0f, 0.2f, 0.1f);*/
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
 		planeMesh->AddParam(MeshBuilderParam::CreatePlane(ZERO, UNIT_Z, UNIT_X, glm::vec2(1.0f)));
 		planeMesh->GenerateMesh();
 
+
+
 		// Set up the scene's camera
 		GameObject::Sptr camera = scene->CreateGameObject("Main Camera");
 		{
-			camera->SetPostion(glm::vec3(5.0f));
+			camera->SetPostion(glm::vec3(12.760f,-10.420f,6.0f));
+			camera->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 			camera->LookAt(glm::vec3(0.0f));
 
+
+			//click n hold to move camera?
 			camera->Add<SimpleCameraControl>();
 
 			Camera::Sptr cam = camera->Add<Camera>();
 			// Make sure that the camera is set as the scene's main camera!
 			scene->MainCamera = cam;
 		}
+
+
 
 		// Set up all our sample objects
 		GameObject::Sptr plane = scene->CreateGameObject("Plane");
@@ -400,7 +408,7 @@ void CreateScene() {
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
 		}
 
-		GameObject::Sptr monkey1 = scene->CreateGameObject("Monkey 1");
+		/*GameObject::Sptr monkey1 = scene->CreateGameObject("Monkey 1");
 		{
 			// Set position in the scene
 			monkey1->SetPostion(glm::vec3(1.5f, 0.0f, 1.0f));
@@ -416,9 +424,28 @@ void CreateScene() {
 			// Add a dynamic rigid body to this monkey
 			RigidBody::Sptr physics = monkey1->Add<RigidBody>(RigidBodyType::Dynamic);
 			physics->AddCollider(ConvexMeshCollider::Create());
-		}
+		}*/
 
-		GameObject::Sptr monkey2 = scene->CreateGameObject("Complex Object");
+		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
+	{
+		// Set position in the scene
+			towerGarden->SetPostion(glm::vec3(0.0f, 0.0f, 1.0f));
+			towerGarden->SetRotation(glm::vec3(90.0f,0.0f,0.0f));
+
+		// Add some behaviour that relies on the physics body
+		//towerGarden->Add<JumpBehaviour>();
+
+		// Create and attach a renderer for the monkey
+		RenderComponent::Sptr renderer = towerGarden->Add<RenderComponent>();
+		renderer->SetMesh(towerGardenMesh);
+		renderer->SetMaterial(testMaterial);
+
+		// Add a dynamic rigid body to this monkey
+		//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
+		//physics->AddCollider(ConvexMeshCollider::Create());
+	}
+
+		/*GameObject::Sptr monkey2 = scene->CreateGameObject("Complex Object");
 		{
 			// Set and rotation position in the scene
 			monkey2->SetPostion(glm::vec3(-1.5f, 0.0f, 1.0f));
@@ -432,10 +459,10 @@ void CreateScene() {
 			// This is an example of attaching a component and setting some parameters
 			RotatingBehaviour::Sptr behaviour = monkey2->Add<RotatingBehaviour>();
 			behaviour->RotationSpeed = glm::vec3(0.0f, 0.0f, -90.0f);
-		}
+		}*/
 
 		// Box to showcase the specular material
-		GameObject::Sptr specBox = scene->CreateGameObject("Specular Object");
+		/*GameObject::Sptr specBox = scene->CreateGameObject("Specular Object");
 		{
 			MeshResource::Sptr boxMesh = ResourceManager::CreateAsset<MeshResource>();
 			boxMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
@@ -448,12 +475,12 @@ void CreateScene() {
 			RenderComponent::Sptr renderer = specBox->Add<RenderComponent>();
 			renderer->SetMesh(boxMesh);
 			renderer->SetMaterial(testMaterial);
-		}
+		}*/
 
 		///// NEW OBJECTS ////
 
 		// sphere to showcase the foliage material
-		GameObject::Sptr foliageBall = scene->CreateGameObject("Foliage Sphere");
+		/*GameObject::Sptr foliageBall = scene->CreateGameObject("Foliage Sphere");
 		{
 			MeshResource::Sptr sphere = ResourceManager::CreateAsset<MeshResource>();
 			sphere->AddParam(MeshBuilderParam::CreateIcoSphere(ZERO, ONE, 8));
@@ -466,10 +493,10 @@ void CreateScene() {
 			RenderComponent::Sptr renderer = foliageBall->Add<RenderComponent>();
 			renderer->SetMesh(sphere);
 			renderer->SetMaterial(foliageMaterial);
-		}
+		}*/
 
 		// Box to showcase the foliage material
-		GameObject::Sptr foliageBox = scene->CreateGameObject("Foliage Box");
+		/*GameObject::Sptr foliageBox = scene->CreateGameObject("Foliage Box");
 		{
 			MeshResource::Sptr box = ResourceManager::CreateAsset<MeshResource>();
 			box->AddParam(MeshBuilderParam::CreateCube(glm::vec3(0, 0, 0.5f) , ONE));
@@ -482,10 +509,10 @@ void CreateScene() {
 			RenderComponent::Sptr renderer = foliageBox->Add<RenderComponent>();
 			renderer->SetMesh(box);
 			renderer->SetMaterial(foliageMaterial);
-		}
+		}*/
 
 		// Box to showcase the specular material
-		GameObject::Sptr toonBall = scene->CreateGameObject("Toon Object");
+		/*GameObject::Sptr toonBall = scene->CreateGameObject("Toon Object");
 		{
 			MeshResource::Sptr sphere = ResourceManager::CreateAsset<MeshResource>();
 			sphere->AddParam(MeshBuilderParam::CreateIcoSphere(ZERO, ONE, 8));
@@ -498,14 +525,15 @@ void CreateScene() {
 			RenderComponent::Sptr renderer = toonBall->Add<RenderComponent>();
 			renderer->SetMesh(sphere);
 			renderer->SetMaterial(toonMaterial);
-		}
+		}*/
 
 		// Kinematic rigid bodies are those controlled by some outside controller
 		// and ONLY collide with dynamic objects
-		RigidBody::Sptr physics = monkey2->Add<RigidBody>(RigidBodyType::Kinematic);
-		physics->AddCollider(ConvexMeshCollider::Create());
+		//RigidBody::Sptr physics = monkey2->Add<RigidBody>(RigidBodyType::Kinematic);
+		//physics->AddCollider(ConvexMeshCollider::Create());
 
 		// Create a trigger volume for testing how we can detect collisions with objects!
+		//USEFUL to implement
 		GameObject::Sptr trigger = scene->CreateGameObject("Trigger");
 		{
 			TriggerVolume::Sptr volume = trigger->Add<TriggerVolume>();
@@ -630,17 +658,107 @@ int main() {
 
 	nlohmann::json editorSceneState;
 
+	int lane = 1;
+	bool isButtonPressed = false;
+
+	// scene->FindObjectByName("MainCamera");
+	//camera = scene->FindObjectByName("Main Camera");
+
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		ImGuiHelper::StartFrame();
+
+		// Grab shorthands to the camera and shader from the scene
+		Camera::Sptr camera = scene->MainCamera;
+
+		//Rotating Camera on Keypress
+		if (glfwGetKey(window, GLFW_KEY_SPACE))
+		{
+			if (!isButtonPressed)
+			{
+			
+			}
+			isButtonPressed = true;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_A))
+		{
+			if (!isButtonPressed)
+			{
+				if (lane == 4)
+				{
+					lane = 1;
+				}
+				else
+				{
+					lane++;
+				}
+				switch (lane)
+				{
+				case 1:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+					break;
+				case 2:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+					break;
+				case 3:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+					break;
+				case 4:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 270.0f));
+					break;
+				default:
+					break;
+				}
+			}
+			isButtonPressed = true;
+		}
+		else if (glfwGetKey(window, GLFW_KEY_D))
+		{
+			if (!isButtonPressed)
+			{
+				if (lane == 1)
+				{
+					lane = 4;
+				}
+				else
+				{
+					lane--;
+				}
+				switch (lane)
+				{
+				case 1:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+					break;
+				case 2:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+					break;
+				case 3:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+					break;
+				case 4:
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 270.0f));
+					break;
+				default:
+					break;
+				}
+			}
+			isButtonPressed = true;
+		}
+		else
+		{
+			isButtonPressed = false;
+		}
+
+
 
 		// Calculate the time since our last frame (dt)
 		double thisFrame = glfwGetTime();
 		float dt = static_cast<float>(thisFrame - lastFrame);
 
 		// Draw our material properties window!
-		DrawMaterialsWindow();
+		//DrawMaterialsWindow();
 
 		// Showcasing how to use the imGui library!
 		bool isDebugWindowOpen = ImGui::Begin("Debugging");
@@ -692,6 +810,10 @@ int main() {
 		// Clear the color and depth buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		ImGui::Text("Lane: %d", lane);
+		ImGui::Separator();
+
 		// Draw some ImGui stuff for the lights
 		if (isDebugWindowOpen) {
 			for (int ix = 0; ix < scene->Lights.size(); ix++) {
@@ -724,7 +846,7 @@ int main() {
 		scene->Update(dt);
 
 		// Grab shorthands to the camera and shader from the scene
-		Camera::Sptr camera = scene->MainCamera;
+		//Camera::Sptr camera = scene->MainCamera;
 
 		// Cache the camera's viewprojection
 		glm::mat4 viewProj = camera->GetViewProjection();
