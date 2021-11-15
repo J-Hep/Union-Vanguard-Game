@@ -278,12 +278,14 @@ void CreateScene() {
 		// Load in the meshes
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
 		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("Full.obj");
+		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("goblinfullrig.obj");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
 		Texture2D::Sptr    boxSpec    = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
 		Texture2D::Sptr    monkeyTex  = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
-		Texture2D::Sptr    leafTex    = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
+		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
+		Texture2D::Sptr    leafTex    = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");		
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
 
@@ -328,6 +330,12 @@ void CreateScene() {
 			testMaterial->Set("u_Material.Specular", boxSpec);
 		}
 
+		Material::Sptr goblinMaterial = ResourceManager::CreateAsset<Material>(reflectiveShader);
+		{
+			goblinMaterial->Name = "Goblin";
+			goblinMaterial->Set("u_Material.Diffuse", goblinTex);
+			goblinMaterial->Set("u_Material.Shininess", 0.1f);
+		}
 		/////////////// NEW MATERIALS ////////////////////
 
 		// Our foliage vertex shader material
@@ -377,7 +385,7 @@ void CreateScene() {
 		{
 			camera->SetPostion(glm::vec3(12.760f,-10.420f,6.0f));
 			camera->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-			camera->LookAt(glm::vec3(0.0f));
+			//camera->LookAt(glm::vec3(0.0f));
 
 
 			//click n hold to move camera?
@@ -427,7 +435,7 @@ void CreateScene() {
 		}*/
 
 		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
-	{
+		{
 		// Set position in the scene
 			towerGarden->SetPostion(glm::vec3(0.0f, 0.0f, 1.0f));
 			towerGarden->SetRotation(glm::vec3(90.0f,0.0f,0.0f));
@@ -443,8 +451,27 @@ void CreateScene() {
 		// Add a dynamic rigid body to this monkey
 		//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
 		//physics->AddCollider(ConvexMeshCollider::Create());
-	}
+		}
 
+		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
+		{
+			// Set position in the scene
+			goblin1->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+			goblin1->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+			goblin1->SetScale(glm::vec3(0.7f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = goblin1->Add<RenderComponent>();
+			renderer->SetMesh(goblinMesh);
+			renderer->SetMaterial(goblinMaterial);
+
+			// Add a dynamic rigid body to this monkey
+			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
+			//physics->AddCollider(ConvexMeshCollider::Create());
+		}
 		/*GameObject::Sptr monkey2 = scene->CreateGameObject("Complex Object");
 		{
 			// Set and rotation position in the scene
@@ -555,6 +582,7 @@ void CreateScene() {
 	}
 }
 
+
 int main() {
 	Logger::Init(); // We'll borrow the logger from the toolkit, but we need to initialize it
 
@@ -658,11 +686,11 @@ int main() {
 
 	nlohmann::json editorSceneState;
 
-	int lane = 1;
-	bool isButtonPressed = false;
+	int lane = 1, spawn = 1;
+	float rotateTo = 0.0f, newRotate = 0.0f, goblinPos = 0.0f;
+	bool isButtonPressed = false, isRotate = false, rotateDir = false, newSpawn = false;
 
-	// scene->FindObjectByName("MainCamera");
-	//camera = scene->FindObjectByName("Main Camera");
+	spawn = rand() % 4 + 1;
 
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
@@ -671,7 +699,10 @@ int main() {
 
 		// Grab shorthands to the camera and shader from the scene
 		Camera::Sptr camera = scene->MainCamera;
+		GameObject::Sptr goblin = scene->FindObjectByName("goblin1");
 
+		double thisFrame = glfwGetTime();
+		float dt = static_cast<float>(thisFrame - lastFrame);
 		//Rotating Camera on Keypress
 		if (glfwGetKey(window, GLFW_KEY_SPACE))
 		{
@@ -683,8 +714,10 @@ int main() {
 		}
 		else if (glfwGetKey(window, GLFW_KEY_A))
 		{
-			if (!isButtonPressed)
+			if (!isButtonPressed && !isRotate)
 			{
+				isRotate = true;
+				rotateDir = true;
 				if (lane == 4)
 				{
 					lane = 1;
@@ -696,16 +729,20 @@ int main() {
 				switch (lane)
 				{
 				case 1:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+					rotateTo = 360.0f;
+					newRotate = 270.0f;
 					break;
 				case 2:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+					rotateTo = 90.0f;
+					newRotate = 0.0f;
 					break;
 				case 3:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+					rotateTo = 180.0f;
+					newRotate = 90.0f;
 					break;
 				case 4:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 270.0f));
+					rotateTo = 270.0f;
+					newRotate = 180.0f;
 					break;
 				default:
 					break;
@@ -715,8 +752,10 @@ int main() {
 		}
 		else if (glfwGetKey(window, GLFW_KEY_D))
 		{
-			if (!isButtonPressed)
+			if (!isButtonPressed && !isRotate)
 			{
+				isRotate = true;
+				rotateDir = false;
 				if (lane == 1)
 				{
 					lane = 4;
@@ -728,17 +767,20 @@ int main() {
 				switch (lane)
 				{
 				case 1:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-
+					rotateTo = 0.0f;
+					newRotate = 90.0f;
 					break;
 				case 2:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+					rotateTo = 90.0f;
+					newRotate = 180.0f;
 					break;
 				case 3:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+					rotateTo = 180.0f;
+					newRotate = 270.0f;
 					break;
 				case 4:
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 270.0f));
+					rotateTo = 270.0f;
+					newRotate = 360.0f;
 					break;
 				default:
 					break;
@@ -751,11 +793,134 @@ int main() {
 			isButtonPressed = false;
 		}
 
+		///Camera Rotation///
+		if (isRotate)
+		{
+			if (rotateDir)
+			{
+				newRotate += dt * 100;
+				camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
+				if (newRotate >= rotateTo)
+				{
+					isRotate = false;
+				}
+				if (newRotate >= 360.0f)
+				{
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+				}
+			}
+			else if (!rotateDir)
+			{
+				newRotate -= dt * 100;
+				camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
+				if (newRotate <= rotateTo)
+				{
+					isRotate = false;
+				}
+				if (newRotate <= 0.0f)
+				{
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 360.0f));
+				}
+			}
+		}
 
+		//////Enemy Spawning//////
+		switch (spawn)
+		{
+		case 1:		//lane 1	
+			if (newSpawn == false)
+			{
+				goblin->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+				goblin->SetPostion(glm::vec3(12.760f, 11.0f, 1.0f));
+				goblinPos = 11.0f;
+				newSpawn = true;
+			}
 
+			if (goblin->GetPosY() <= -10.420f)
+			{
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				break;
+			}
+			else
+			{
+				goblinPos = goblin->GetPosY();
+				goblinPos -= dt * 2;
+				goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
+				break;
+			}
+		case 2:		//lane 2
+			
+			if (newSpawn == false)
+			{
+				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+				goblin->SetPostion(glm::vec3(-9.0f, -10.420f, 1.0f));
+				goblinPos = -9.0f;
+				newSpawn = true;
+			}
+
+			if (goblin->GetPosX() >= 12.760f)
+			{				
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				break;
+			}
+			else
+			{
+				goblinPos = goblin->GetPosX();
+				goblinPos += dt * 2;
+				goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
+				break;
+			}
+		case 3:		//lane 3	
+			if (newSpawn == false)
+			{
+				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+				goblin->SetPostion(glm::vec3(12.760f, -32.0f, 1.0f));
+				goblinPos = -32.0f;
+				newSpawn = true;
+			}
+
+			if (goblin->GetPosY() >= -10.420f)
+			{				
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				break;
+			}
+			else
+			{
+				goblinPos = goblin->GetPosY();
+				goblinPos += dt * 2;
+				goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
+				break;
+			}
+		case 4:		//lane 4	
+			if (newSpawn == false)
+			{
+				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+				goblin->SetPostion(glm::vec3(35.0f, -10.420f, 1.0f));
+				goblinPos = 35.0f;
+				newSpawn = true;
+			}
+
+			if (goblin->GetPosX() <= 12.760f)
+			{				
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				break;
+			}
+			else
+			{
+				goblinPos = goblin->GetPosX();
+				goblinPos -= dt * 2;
+				goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
+				break;
+			}
+		default:
+			break;
+		}
 		// Calculate the time since our last frame (dt)
-		double thisFrame = glfwGetTime();
-		float dt = static_cast<float>(thisFrame - lastFrame);
+		
 
 		// Draw our material properties window!
 		//DrawMaterialsWindow();

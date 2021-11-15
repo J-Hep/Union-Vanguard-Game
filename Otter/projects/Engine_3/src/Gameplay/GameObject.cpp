@@ -76,6 +76,16 @@ namespace Gameplay {
 		return _position;
 	}
 
+	const float& GameObject::GetPosX() const
+	{
+		return _position.x;
+	}
+
+	const float& GameObject::GetPosY() const
+	{
+		return _position.y;
+	}
+
 	void GameObject::SetRotation(const glm::quat& value) {
 		_rotation = value;
 		_isTransformDirty = true;

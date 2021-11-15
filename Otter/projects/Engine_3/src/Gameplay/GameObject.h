@@ -74,6 +74,8 @@ namespace Gameplay {
 		/// </summary>
 		const glm::vec3& GetPosition() const;
 
+		const float& GetPosX() const;
+		const float& GetPosY() const;
 		/// <summary>
 		/// Sets the rotation of this object to a quaternion value
 		/// </summary>
