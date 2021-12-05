@@ -539,34 +539,418 @@ void CreateScene() {
 		}*/
 
 		/////////////////////////// UI //////////////////////////////
-		GameObject::Sptr canvas = scene->CreateGameObject("UI Canvas");
+		GameObject::Sptr canvas = scene->CreateGameObject("Main Menu");
 		{
 			RectTransform::Sptr transform = canvas->Add<RectTransform>();
-			transform->SetMin({ 16, 16 });
-			transform->SetMax({ 256, 256 });
-
-			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 			
-			GameObject::Sptr subPanel = scene->CreateGameObject("Sub Item");
+			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+			
+			GameObject::Sptr subPanel = scene->CreateGameObject("Button1");
 			{
 				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
 				transform->SetMin({ 10, 10 });
-				transform->SetMax({ 128, 128 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 300.0f));
 
 				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
 
-				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
 				font->Bake();
 
 				GuiText::Sptr text = subPanel->Add<GuiText>();
-				text->SetText("Hello world!");
+				text->SetText("Play");
 				text->SetFont(font);
+				
 			}
-
 			canvas->AddChild(subPanel);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button2");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Settings");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button3");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Vanguard");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel4);
 		}
 
+		GameObject::Sptr canvas2 = scene->CreateGameObject("Settings Menu");
+		{
+			RectTransform::Sptr transform = canvas2->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas2->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel = scene->CreateGameObject("Button4");
+			{
+				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 300.0f));
+
+				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel->Add<GuiText>();
+				text->SetText("Settings stuff");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button5");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("More Settings");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button6");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Back");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Settings Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Settings");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel4);
+		}
+
+		GameObject::Sptr canvas3 = scene->CreateGameObject("inGameGUI");
+		{
+			RectTransform::Sptr transform = canvas3->Add<RectTransform>();
+			transform->SetMin({ 6, 10 });
+			transform->SetMax({ 110, 50 });
+			transform->SetPosition(glm::vec2(70.0f, 775.0f));
+
+			GuiPanel::Sptr canPanel = canvas3->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+			font->Bake();
+
+			GuiText::Sptr text = canvas3->Add<GuiText>();
+			text->SetText("0");
+			text->SetFont(font);
+		}
+
+		GameObject::Sptr canvas4 = scene->CreateGameObject("Pause Menu");
+		{
+			RectTransform::Sptr transform = canvas4->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas4->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button7");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button8");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Resume");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Paused Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Paused");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel4);
+		}
+
+		GameObject::Sptr canvas5 = scene->CreateGameObject("Win");
+		{
+			RectTransform::Sptr transform = canvas5->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas5->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("FinalScoreW");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button9");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Win Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("YOU WIN!");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel4);
+		}
+
+		GameObject::Sptr canvas6 = scene->CreateGameObject("Lose");
+		{
+			RectTransform::Sptr transform = canvas6->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas6->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("FinalScoreL");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button10");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Win Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("GAME OVER!");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel4);
+		}
 		GuiBatcher::SetDefaultTexture(ResourceManager::CreateAsset<Texture2D>("textures/ui-sprite.png"));
 		GuiBatcher::SetDefaultBorderRadius(8);
 
@@ -690,12 +1074,18 @@ int main() {
 
 	nlohmann::json editorSceneState;
 
-	int lane = 1, spawn = 1;
+	int lane = 1, spawn = 1, menuSelect = 1, menuType = 1, score = 0;
+	//menuType 1 = main menu
+	//menuType 2 = settings
+	//menuType 3 = pause menu
+	//menuType 4 = win screen
+	//menuType 5 = lose screen
 	float rotateTo = 0.0f, newRotate = 0.0f, goblinPos = 0.0f;
-	bool isButtonPressed = false, isRotate = false, rotateDir = false, newSpawn = false;
+	bool isButtonPressed = false, isRotate = false, rotateDir = false, newSpawn = false, isGameRunning = false, startUp = true;
 
 	spawn = rand() % 4 + 1;
 
+	
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -703,227 +1093,537 @@ int main() {
 
 		Camera::Sptr camera = scene->MainCamera;
 		GameObject::Sptr goblin = scene->FindObjectByName("goblin1");
+		GameObject::Sptr mainMenu = scene->FindObjectByName("Main Menu");
+		GameObject::Sptr mainMenuB1 = scene->FindObjectByName("Button1");
+		GameObject::Sptr mainMenuB2 = scene->FindObjectByName("Button2");
+		GameObject::Sptr mainMenuB3 = scene->FindObjectByName("Button3");
+
+		GameObject::Sptr settingsMenu = scene->FindObjectByName("Settings Menu");
+		GameObject::Sptr settingsMenuB1 = scene->FindObjectByName("Button4");
+		GameObject::Sptr settingsMenuB2 = scene->FindObjectByName("Button5");
+		GameObject::Sptr settingsMenuB3 = scene->FindObjectByName("Button6");
+
+		GameObject::Sptr inGame = scene->FindObjectByName("inGameGUI");
+
+		GameObject::Sptr pauseMenu = scene->FindObjectByName("Pause Menu");
+		GameObject::Sptr pauseMenuB1 = scene->FindObjectByName("Button7");
+		GameObject::Sptr pauseMenuB2 = scene->FindObjectByName("Button8");
+
+		GameObject::Sptr winMenu = scene->FindObjectByName("Win");
+		GameObject::Sptr winMenuScore = scene->FindObjectByName("FinalScoreW");
+		GameObject::Sptr winMenuB1 = scene->FindObjectByName("Button9");
+
+		GameObject::Sptr loseMenu = scene->FindObjectByName("Lose");
+		GameObject::Sptr loseMenuScore = scene->FindObjectByName("FinalScoreL");
+		GameObject::Sptr loseMenuB1 = scene->FindObjectByName("Button10");
 
 		// Calculate the time since our last frame (dt)
 		double thisFrame = glfwGetTime();
 		float dt = static_cast<float>(thisFrame - lastFrame);
 
-		if (glfwGetKey(window, GLFW_KEY_SPACE))
+		//GUI Startup
+		if (startUp == true)
 		{
-			if (!isButtonPressed)
-			{
-
-			}
-			isButtonPressed = true;
+			settingsMenu->SetEnabled(false);
+			inGame->SetEnabled(false);
+			pauseMenu->SetEnabled(false);
+			winMenu->SetEnabled(false);
+			loseMenu->SetEnabled(false);
+			startUp = false;
 		}
-		else if (glfwGetKey(window, GLFW_KEY_A))
+
+		//menu systems
+		if (isGameRunning == false)
 		{
-			if (!isButtonPressed && !isRotate)
+			//main menu selection color
+			if (menuType == 1)
 			{
-				isRotate = true;
-				rotateDir = true;
-				if (lane == 4)
+				//main menu button selection 
+				if (menuSelect == 1)
 				{
-					lane = 1;
+					mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 				}
 				else
 				{
-					lane++;
+					mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
 				}
-				switch (lane)
+				if (menuSelect == 2)
 				{
-				case 1:
-					rotateTo = 360.0f;
-					newRotate = 270.0f;
-					break;
-				case 2:
-					rotateTo = 90.0f;
-					newRotate = 0.0f;
-					break;
-				case 3:
-					rotateTo = 180.0f;
-					newRotate = 90.0f;
-					break;
-				case 4:
-					rotateTo = 270.0f;
-					newRotate = 180.0f;
-					break;
-				default:
-					break;
-				}
-			}
-			isButtonPressed = true;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_D))
-		{
-			if (!isButtonPressed && !isRotate)
-			{
-				isRotate = true;
-				rotateDir = false;
-				if (lane == 1)
-				{
-					lane = 4;
+					mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 				}
 				else
 				{
-					lane--;
+					mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
 				}
-				switch (lane)
+				if (menuSelect == 3)
 				{
-				case 1:
-					rotateTo = 0.0f;
-					newRotate = 90.0f;
-					break;
-				case 2:
-					rotateTo = 90.0f;
-					newRotate = 180.0f;
-					break;
-				case 3:
-					rotateTo = 180.0f;
-					newRotate = 270.0f;
-					break;
-				case 4:
-					rotateTo = 270.0f;
-					newRotate = 360.0f;
-					break;
-				default:
-					break;
+					mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
 				}
 			}
-			isButtonPressed = true;
+			//settings selection color
+			else if (menuType == 2)
+			{
+				//main menu button selection 
+				if (menuSelect == 1)
+				{
+					settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				}
+				if (menuSelect == 2)
+				{
+					settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				}
+				if (menuSelect == 3)
+				{
+					settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				}
+			}
+			//pause selection color
+			else if (menuType == 4)
+			{
+				if (menuSelect == 1)
+				{
+					pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				}
+				if (menuSelect == 2)
+				{
+					pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				}
+			}
+			//win screen selection color
+			else if (menuType == 5)
+			{
+				winMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			}
+			//lose screen selection color
+			else if (menuType == 6)
+			{
+				loseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			}
+			
+
+			if (glfwGetKey(window, GLFW_KEY_UP)) //select up
+			{
+				if (!isButtonPressed)
+				{
+					if (menuType == 4)
+					{
+						if (menuSelect == 1)
+						{
+							menuSelect = 2;
+						}
+						else
+						{
+							menuSelect = 1;
+						}
+					}
+					else
+					{
+						if (menuSelect == 1)
+						{
+							menuSelect = 3;
+						}
+						else
+						{
+							menuSelect--;
+						}
+					}
+				}
+				isButtonPressed = true;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_DOWN)) //select down
+			{
+				if (!isButtonPressed)
+				{
+					if (menuType == 4)
+					{
+						if (menuSelect == 2)
+						{
+							menuSelect = 1;
+						}
+						else
+						{
+							menuSelect = 2;
+						}
+					}
+					else
+					{
+						if (menuSelect == 3)
+						{
+							menuSelect = 1;
+						}
+						else
+						{
+							menuSelect++;
+						}
+					}
+				}
+				isButtonPressed = true;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_ENTER))  //button selection
+			{
+				if (!isButtonPressed)
+				{
+					//main menu
+					if (menuType == 1)
+					{
+						if (menuSelect == 1)
+						{
+							mainMenu->SetEnabled(false);
+							inGame->SetEnabled(true);
+							menuType = 3;
+							isGameRunning = true;
+						}
+						if (menuSelect == 2)
+						{
+							mainMenu->SetEnabled(false);
+							settingsMenu->SetEnabled(true);
+							settingsMenu->RenderGUI();
+							menuType = 2;
+						}
+						if (menuSelect == 3)
+						{
+							return(0);
+						}
+					}
+					//settings
+					else if (menuType == 2)
+					{
+						if (menuSelect == 3)
+						{
+							settingsMenu->SetEnabled(false);
+							mainMenu->SetEnabled(true);
+							mainMenu->RenderGUI();
+							menuType = 1;
+						}
+					}
+					//pause menu
+					else if (menuType == 4)
+					{
+						if (menuSelect == 1)
+						{
+							return(0);
+						}
+						else if (menuSelect == 2)
+						{
+							pauseMenu->SetEnabled(false);
+							inGame->SetEnabled(true);
+							menuType = 3;
+							isGameRunning = true;
+						}
+					}
+					//win screen
+					else if (menuType == 5)
+					{
+						return(0);
+					}
+					//lose screen
+					else if (menuType == 6)
+					{
+						return(0);
+					}
+				}
+				isButtonPressed = true;
+			}
+			else
+			{
+				isButtonPressed = false;
+			}
 		}
-		else
+		//game systems
+		else if (isGameRunning == true)
 		{
-			isButtonPressed = false;
+			if (menuType == 3)
+			{
+				if (glfwGetKey(window, GLFW_KEY_N)) //this is for the score counter change it to add score when enemy has been defeated
+				{
+					if (!isButtonPressed)
+					{
+						score += 10;
+						inGame->Get<GuiText>()->SetText(std::to_string(score));
+					}
+					isButtonPressed = true;
+				}
+				else if (glfwGetKey(window, GLFW_KEY_K)) //this is for the win condition change it to trigger when needed
+				{
+					if (!isButtonPressed)
+					{
+						inGame->SetEnabled(false);
+						winMenu->SetEnabled(true);
+						winMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
+						isGameRunning = false;
+						menuType = 5;
+					}
+					isButtonPressed = true;
+				}
+				else if (glfwGetKey(window, GLFW_KEY_L)) //this is for the lose condition change it to trigger when needed
+				{
+					if (!isButtonPressed)
+					{
+						inGame->SetEnabled(false);
+						loseMenu->SetEnabled(true);
+						loseMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
+						isGameRunning = false;
+						menuType = 6;
+					}
+					isButtonPressed = true;
+				}
+				else if (glfwGetKey(window, GLFW_KEY_P))  //pause button
+				{
+					if (!isButtonPressed)
+					{
+						pauseMenu->SetEnabled(true);
+						inGame->SetEnabled(false);
+						isGameRunning = false;
+						menuType = 4;
+					}
+					isButtonPressed = true;
+				}
+				else
+				{
+					isButtonPressed = false;
+				}
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_SPACE))  //shooting button
+			{
+				if (!isButtonPressed)
+				{
+
+				}
+				isButtonPressed = true;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_A))
+			{
+				if (!isButtonPressed && !isRotate)
+				{
+					isRotate = true;
+					rotateDir = true;
+					if (lane == 4)
+					{
+						lane = 1;
+					}
+					else
+					{
+						lane++;
+					}
+					switch (lane)
+					{
+					case 1:
+						rotateTo = 360.0f;
+						newRotate = 270.0f;
+						break;
+					case 2:
+						rotateTo = 90.0f;
+						newRotate = 0.0f;
+						break;
+					case 3:
+						rotateTo = 180.0f;
+						newRotate = 90.0f;
+						break;
+					case 4:
+						rotateTo = 270.0f;
+						newRotate = 180.0f;
+						break;
+					default:
+						break;
+					}
+				}
+				isButtonPressed = true;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_D))
+			{
+				if (!isButtonPressed && !isRotate)
+				{
+					isRotate = true;
+					rotateDir = false;
+					if (lane == 1)
+					{
+						lane = 4;
+					}
+					else
+					{
+						lane--;
+					}
+					switch (lane)
+					{
+					case 1:
+						rotateTo = 0.0f;
+						newRotate = 90.0f;
+						break;
+					case 2:
+						rotateTo = 90.0f;
+						newRotate = 180.0f;
+						break;
+					case 3:
+						rotateTo = 180.0f;
+						newRotate = 270.0f;
+						break;
+					case 4:
+						rotateTo = 270.0f;
+						newRotate = 360.0f;
+						break;
+					default:
+						break;
+					}
+				}
+				isButtonPressed = true;
+			}
+			else
+			{
+				isButtonPressed = false;
+			}
+
+			///Camera Rotation///
+			if (isRotate)
+			{
+				if (rotateDir)
+				{
+					newRotate += dt * 100;
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
+					if (newRotate >= rotateTo)
+					{
+						isRotate = false;
+					}
+					if (newRotate >= 360.0f)
+					{
+						camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+					}
+				}
+				else if (!rotateDir)
+				{
+					newRotate -= dt * 100;
+					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
+					if (newRotate <= rotateTo)
+					{
+						isRotate = false;
+					}
+					if (newRotate <= 0.0f)
+					{
+						camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 360.0f));
+					}
+				}
+			}
+
+			//////Enemy Spawning//////
+			switch (spawn)
+			{
+			case 1:		//lane 1	
+				if (newSpawn == false)
+				{
+					goblin->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+					goblin->SetPostion(glm::vec3(12.760f, 11.0f, 1.0f));
+					goblinPos = 11.0f;
+					newSpawn = true;
+				}
+
+				if (goblin->GetPosY() <= -10.420f)
+				{
+					spawn = rand() % 4 + 1;
+					newSpawn = false;
+					break;
+				}
+				else
+				{
+					goblinPos = goblin->GetPosY();
+					goblinPos -= dt * 2;
+					goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
+					break;
+				}
+			case 2:		//lane 2
+
+				if (newSpawn == false)
+				{
+					goblin->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+					goblin->SetPostion(glm::vec3(-9.0f, -10.420f, 1.0f));
+					goblinPos = -9.0f;
+					newSpawn = true;
+				}
+
+				if (goblin->GetPosX() >= 12.760f)
+				{
+					spawn = rand() % 4 + 1;
+					newSpawn = false;
+					break;
+				}
+				else
+				{
+					goblinPos = goblin->GetPosX();
+					goblinPos += dt * 2;
+					goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
+					break;
+				}
+			case 3:		//lane 3	
+				if (newSpawn == false)
+				{
+					goblin->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+					goblin->SetPostion(glm::vec3(12.760f, -32.0f, 1.0f));
+					goblinPos = -32.0f;
+					newSpawn = true;
+				}
+
+				if (goblin->GetPosY() >= -10.420f)
+				{
+					spawn = rand() % 4 + 1;
+					newSpawn = false;
+					break;
+				}
+				else
+				{
+					goblinPos = goblin->GetPosY();
+					goblinPos += dt * 2;
+					goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
+					break;
+				}
+			case 4:		//lane 4	
+				if (newSpawn == false)
+				{
+					goblin->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
+					goblin->SetPostion(glm::vec3(35.0f, -10.420f, 1.0f));
+					goblinPos = 35.0f;
+					newSpawn = true;
+				}
+
+				if (goblin->GetPosX() <= 12.760f)
+				{
+					spawn = rand() % 4 + 1;
+					newSpawn = false;
+					break;
+				}
+				else
+				{
+					goblinPos = goblin->GetPosX();
+					goblinPos -= dt * 2;
+					goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
+					break;
+				}
+			default:
+				break;
+			}
 		}
-
-		///Camera Rotation///
-		if (isRotate)
-		{
-			if (rotateDir)
-			{
-				newRotate += dt * 100;
-				camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
-				if (newRotate >= rotateTo)
-				{
-					isRotate = false;
-				}
-				if (newRotate >= 360.0f)
-				{
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-				}
-			}
-			else if (!rotateDir)
-			{
-				newRotate -= dt * 100;
-				camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, newRotate));
-				if (newRotate <= rotateTo)
-				{
-					isRotate = false;
-				}
-				if (newRotate <= 0.0f)
-				{
-					camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 360.0f));
-				}
-			}
-		}
-
-		//////Enemy Spawning//////
-		switch (spawn)
-		{
-		case 1:		//lane 1	
-			if (newSpawn == false)
-			{
-				goblin->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
-				goblin->SetPostion(glm::vec3(12.760f, 11.0f, 1.0f));
-				goblinPos = 11.0f;
-				newSpawn = true;
-			}
-
-			if (goblin->GetPosY() <= -10.420f)
-			{
-				spawn = rand() % 4 + 1;
-				newSpawn = false;
-				break;
-			}
-			else
-			{
-				goblinPos = goblin->GetPosY();
-				goblinPos -= dt * 2;
-				goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
-				break;
-			}
-		case 2:		//lane 2
-
-			if (newSpawn == false)
-			{
-				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
-				goblin->SetPostion(glm::vec3(-9.0f, -10.420f, 1.0f));
-				goblinPos = -9.0f;
-				newSpawn = true;
-			}
-
-			if (goblin->GetPosX() >= 12.760f)
-			{
-				spawn = rand() % 4 + 1;
-				newSpawn = false;
-				break;
-			}
-			else
-			{
-				goblinPos = goblin->GetPosX();
-				goblinPos += dt * 2;
-				goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
-				break;
-			}
-		case 3:		//lane 3	
-			if (newSpawn == false)
-			{
-				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
-				goblin->SetPostion(glm::vec3(12.760f, -32.0f, 1.0f));
-				goblinPos = -32.0f;
-				newSpawn = true;
-			}
-
-			if (goblin->GetPosY() >= -10.420f)
-			{
-				spawn = rand() % 4 + 1;
-				newSpawn = false;
-				break;
-			}
-			else
-			{
-				goblinPos = goblin->GetPosY();
-				goblinPos += dt * 2;
-				goblin->SetPostion(glm::vec3(12.760f, goblinPos, 1.0f));
-				break;
-			}
-		case 4:		//lane 4	
-			if (newSpawn == false)
-			{
-				goblin->SetRotation(glm::vec3(90.0f, 0.0f, 180.0f));
-				goblin->SetPostion(glm::vec3(35.0f, -10.420f, 1.0f));
-				goblinPos = 35.0f;
-				newSpawn = true;
-			}
-
-			if (goblin->GetPosX() <= 12.760f)
-			{
-				spawn = rand() % 4 + 1;
-				newSpawn = false;
-				break;
-			}
-			else
-			{
-				goblinPos = goblin->GetPosX();
-				goblinPos -= dt * 2;
-				goblin->SetPostion(glm::vec3(goblinPos, -10.420f, 1.0f));
-				break;
-			}
-		default:
-			break;
-		}
-
 		// Draw our material properties window!
 		DrawMaterialsWindow();
 
