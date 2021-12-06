@@ -277,7 +277,7 @@ void CreateScene() {
 
 		// Load in the meshes
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
-		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("Full.obj");
+		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("TowerV1.obj");
 		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("goblinfullrig.obj");
 
 		// Load in some textures
@@ -399,7 +399,7 @@ void CreateScene() {
 
 
 		// Set up all our sample objects
-		GameObject::Sptr plane = scene->CreateGameObject("Plane");
+		/*GameObject::Sptr plane = scene->CreateGameObject("Plane");
 		{
 			// Make a big tiled mesh
 			MeshResource::Sptr tiledMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -412,9 +412,9 @@ void CreateScene() {
 			renderer->SetMaterial(boxMaterial);
 
 			// Attach a plane collider that extends infinitely along the X/Y axis
-			RigidBody::Sptr physics = plane->Add<RigidBody>(/*static by default*/);
+			RigidBody::Sptr physics = plane->Add<RigidBody>(/*static by default);
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
-		}
+		}*/
 
 		/*GameObject::Sptr monkey1 = scene->CreateGameObject("Monkey 1");
 		{
@@ -437,7 +437,7 @@ void CreateScene() {
 		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
 		{
 		// Set position in the scene
-			towerGarden->SetPostion(glm::vec3(0.0f, 0.0f, 1.0f));
+			towerGarden->SetPostion(glm::vec3(0.0f, 1.0f, 1.0f));
 			towerGarden->SetRotation(glm::vec3(90.0f,0.0f,0.0f));
 
 		// Add some behaviour that relies on the physics body

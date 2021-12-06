@@ -310,13 +310,16 @@ void CreateScene() {
 
 		// Load in the meshes
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
-		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("Full.obj");
+		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("FinalArea.obj");
+		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("TowerV1.obj");
 		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("goblinfullrig.obj");
+		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("CubeTester.fbx");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
 		Texture2D::Sptr    boxSpec      = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
 		Texture2D::Sptr    monkeyTex    = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
+		Texture2D::Sptr    gardenTowerTexture = ResourceManager::CreateAsset<Texture2D>("textures/YYY5.png");
 		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
 		Texture2D::Sptr    leafTex      = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
 		leafTex->SetMinFilter(MinFilter::Nearest);
@@ -363,6 +366,14 @@ void CreateScene() {
 			testMaterial->Set("u_Material.Diffuse", boxTexture);
 			testMaterial->Set("u_Material.Specular", boxSpec);
 		}
+
+		Material::Sptr gardenTowerMaterial = ResourceManager::CreateAsset<Material>(basicShader);
+		{
+			gardenTowerMaterial->Name = "GardenTowerMat";
+			gardenTowerMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			gardenTowerMaterial->Set("u_Material.Shininess", 0.1f);
+		}
+
 
 		Material::Sptr goblinMaterial = ResourceManager::CreateAsset<Material>(reflectiveShader);
 		{
@@ -435,16 +446,27 @@ void CreateScene() {
 		}
 
 		// Create some lights for our scene
-		scene->Lights.resize(3);
-		scene->Lights[0].Position = glm::vec3(0.0f, 1.0f, 3.0f);
+		scene->Lights.resize(5);
+		scene->Lights[0].Position = glm::vec3(15.0f, -10.0f, 12.0f);
 		scene->Lights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[0].Range = 100.0f;
 
-		scene->Lights[1].Position = glm::vec3(1.0f, 0.0f, 3.0f);
-		scene->Lights[1].Color = glm::vec3(0.2f, 0.8f, 0.1f);
+		scene->Lights[1].Position = glm::vec3(10.0f, 20.0f, 12.0f);
+		scene->Lights[1].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+		scene->Lights[1].Range = 100.0f;
 
-		scene->Lights[2].Position = glm::vec3(0.0f, 1.0f, 3.0f);
-		scene->Lights[2].Color = glm::vec3(1.0f, 0.2f, 0.1f);
+		scene->Lights[2].Position = glm::vec3(40.0f, -10.0f, 12.0f);
+		scene->Lights[2].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+		scene->Lights[2].Range = 100.0f;
+
+		scene->Lights[3].Position = glm::vec3(12.0f, -40.0f, 12.0f);
+		scene->Lights[3].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+		scene->Lights[3].Range = 100.0f;
+
+		scene->Lights[4].Position = glm::vec3(-15.0f, -10.0f, 12.0f);
+		scene->Lights[4].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+		scene->Lights[4].Range = 100.0f;
+	
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -469,7 +491,7 @@ void CreateScene() {
 		}
 
 		// Set up all our sample objects
-		GameObject::Sptr plane = scene->CreateGameObject("Plane");
+		/*GameObject::Sptr plane = scene->CreateGameObject("Plane");
 		{
 			// Make a big tiled mesh
 			MeshResource::Sptr tiledMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -482,14 +504,14 @@ void CreateScene() {
 			renderer->SetMaterial(boxMaterial);
 
 			// Attach a plane collider that extends infinitely along the X/Y axis
-			RigidBody::Sptr physics = plane->Add<RigidBody>(/*static by default*/);
+			RigidBody::Sptr physics = plane->Add<RigidBody>(/*static by default);
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
-		}
+		}*/
 
 		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
 		{
 			// Set position in the scene
-			towerGarden->SetPostion(glm::vec3(0.0f, 0.0f, 1.0f));
+			towerGarden->SetPostion(glm::vec3(-118.0f, -154.0f, -4.0f));
 			towerGarden->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 
 			// Add some behaviour that relies on the physics body
@@ -498,12 +520,43 @@ void CreateScene() {
 			// Create and attach a renderer for the monkey
 			RenderComponent::Sptr renderer = towerGarden->Add<RenderComponent>();
 			renderer->SetMesh(towerGardenMesh);
-			renderer->SetMaterial(testMaterial);
+			renderer->SetMaterial(gardenTowerMaterial);
 
 			// Add a dynamic rigid body to this monkey
 			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
 			//physics->AddCollider(ConvexMeshCollider::Create());
 		}
+
+		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
+		{
+			towerCannon->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			towerCannon->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = towerCannon->Add<RenderComponent>();
+			renderer->SetMesh(towerCannonMesh);
+			renderer->SetMaterial(gardenTowerMaterial);
+
+		}
+
+		GameObject::Sptr towerSpears = scene->CreateGameObject("towerSpears");
+		{
+			towerSpears->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			towerSpears->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = towerSpears->Add<RenderComponent>();
+			renderer->SetMesh(spearMesh);
+			renderer->SetMaterial(goblinMaterial);
+
+		}
+
 
 		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
 		{
