@@ -12,6 +12,9 @@
 #include <optional>
 #include <string>
 
+#include <memory>
+#include <ctime>
+
 // GLM math library
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
@@ -53,6 +56,8 @@
 #include "Gameplay/Components/JumpBehaviour.h"
 #include "Gameplay/Components/RenderComponent.h"
 #include "Gameplay/Components/MaterialSwapBehaviour.h"
+#include "Gameplay/Components/CMorphMeshRenderer.h"
+#include "Gameplay/Components/CMorphAnimator.h"
 
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
@@ -71,6 +76,16 @@
 #include "Gameplay/Components/GUI/GuiPanel.h"
 #include "Gameplay/Components/GUI/GuiText.h"
 #include "Gameplay/InputEngine.h"
+
+// Animator
+#include "NOU/App.h"
+#include "NOU/Input.h"
+#include "NOU/Entity.h"
+#include "NOU/CCamera.h"
+#include "NOU/GLTFLoader.h"
+
+#include "imgui.h"
+
 
 //#define LOG_GL_NOTIFICATIONS 
 
