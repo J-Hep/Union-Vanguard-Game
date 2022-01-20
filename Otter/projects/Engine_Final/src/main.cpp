@@ -270,7 +270,7 @@ void CreateScene() {
 		scene->Window = window;
 		scene->Awake();
 	} 
-	else {  
+	else {
 		// This time we'll have 2 different shaders, and share data between both of them using the UBO
 		// This shader will handle reflective materials 
 		Shader::Sptr reflectiveShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
@@ -307,9 +307,9 @@ void CreateScene() {
 
 		// This shader handles our displacement mapping example
 		Shader::Sptr displacementShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
-			{ ShaderPartType::Vertex, "shaders/vertex_shaders/displacement_mapping.glsl" }, 
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/displacement_mapping.glsl" },
 			{ ShaderPartType::Fragment, "shaders/fragment_shaders/frag_tangentspace_normal_maps.glsl" }
-		});    
+		});
 
 		// This shader handles our displacement mapping example
 		Shader::Sptr tangentSpaceMapping = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
@@ -327,16 +327,17 @@ void CreateScene() {
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
 		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("FinalArea.obj");
 		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("TowerV1.obj");
+		MeshResource::Sptr cannonBallMesh = ResourceManager::CreateAsset<MeshResource>("Cannonball.obj");
 		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("goblinfullrig.obj");
 		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("CubeTester.fbx");
 
 		// Load in some textures
-		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
-		Texture2D::Sptr    boxSpec      = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
-		Texture2D::Sptr    monkeyTex    = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
+		Texture2D::Sptr    boxTexture = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
+		Texture2D::Sptr    boxSpec = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
+		Texture2D::Sptr    monkeyTex = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
 		Texture2D::Sptr    gardenTowerTexture = ResourceManager::CreateAsset<Texture2D>("textures/YYY5.png");
 		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
-		Texture2D::Sptr    leafTex      = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
+		Texture2D::Sptr    leafTex = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
 
@@ -389,6 +390,12 @@ void CreateScene() {
 			gardenTowerMaterial->Set("u_Material.Shininess", 0.1f);
 		}
 
+		Material::Sptr cannonBallMaterial = ResourceManager::CreateAsset<Material>(basicShader);
+		{
+			cannonBallMaterial->Name = "CannonBallMat";
+			cannonBallMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			cannonBallMaterial->Set("u_Material.Shininess", 0.1f);
+		}
 
 		Material::Sptr goblinMaterial = ResourceManager::CreateAsset<Material>(reflectiveShader);
 		{
@@ -406,9 +413,9 @@ void CreateScene() {
 			foliageMaterial->Set("u_Material.Threshold", 0.1f);
 
 			foliageMaterial->Set("u_WindDirection", glm::vec3(1.0f, 1.0f, 0.0f));
-			foliageMaterial->Set("u_WindStrength",  0.5f);
+			foliageMaterial->Set("u_WindStrength", 0.5f);
 			foliageMaterial->Set("u_VerticalScale", 1.0f);
-			foliageMaterial->Set("u_WindSpeed",     1.0f);
+			foliageMaterial->Set("u_WindSpeed", 1.0f);
 		}
 
 		// Our toon shader material
@@ -425,21 +432,21 @@ void CreateScene() {
 		Material::Sptr displacementTest = ResourceManager::CreateAsset<Material>(displacementShader);
 		{
 			Texture2D::Sptr displacementMap = ResourceManager::CreateAsset<Texture2D>("textures/displacement_map.png");
-			Texture2D::Sptr normalMap       = ResourceManager::CreateAsset<Texture2D>("textures/normal_map.png");
-			Texture2D::Sptr diffuseMap      = ResourceManager::CreateAsset<Texture2D>("textures/bricks_diffuse.png");
+			Texture2D::Sptr normalMap = ResourceManager::CreateAsset<Texture2D>("textures/normal_map.png");
+			Texture2D::Sptr diffuseMap = ResourceManager::CreateAsset<Texture2D>("textures/bricks_diffuse.png");
 
 			displacementTest->Name = "Displacement Map";
-			displacementTest->Set("u_Material.Diffuse", diffuseMap);   
+			displacementTest->Set("u_Material.Diffuse", diffuseMap);
 			displacementTest->Set("s_Heightmap", displacementMap);
-			displacementTest->Set("s_NormalMap", normalMap);  
-			displacementTest->Set("u_Material.Shininess", 0.5f); 
-			displacementTest->Set("u_Scale", 0.1f);   
+			displacementTest->Set("s_NormalMap", normalMap);
+			displacementTest->Set("u_Material.Shininess", 0.5f);
+			displacementTest->Set("u_Scale", 0.1f);
 		}
 
 		Material::Sptr normalmapMat = ResourceManager::CreateAsset<Material>(tangentSpaceMapping);
 		{
-			Texture2D::Sptr normalMap       = ResourceManager::CreateAsset<Texture2D>("textures/normal_map.png");
-			Texture2D::Sptr diffuseMap      = ResourceManager::CreateAsset<Texture2D>("textures/bricks_diffuse.png");
+			Texture2D::Sptr normalMap = ResourceManager::CreateAsset<Texture2D>("textures/normal_map.png");
+			Texture2D::Sptr diffuseMap = ResourceManager::CreateAsset<Texture2D>("textures/bricks_diffuse.png");
 
 			normalmapMat->Name = "Tangent Space Normal Map";
 			normalmapMat->Set("u_Material.Diffuse", diffuseMap);
@@ -448,16 +455,16 @@ void CreateScene() {
 			normalmapMat->Set("u_Scale", 0.1f);
 		}
 
-		Material::Sptr multiTextureMat = ResourceManager::CreateAsset<Material>(multiTextureShader); 
+		Material::Sptr multiTextureMat = ResourceManager::CreateAsset<Material>(multiTextureShader);
 		{
-			Texture2D::Sptr sand  = ResourceManager::CreateAsset<Texture2D>("textures/terrain/sand.png");
+			Texture2D::Sptr sand = ResourceManager::CreateAsset<Texture2D>("textures/terrain/sand.png");
 			Texture2D::Sptr grass = ResourceManager::CreateAsset<Texture2D>("textures/terrain/grass.png");
 
 			multiTextureMat->Name = "Multitexturing";
 			multiTextureMat->Set("u_Material.DiffuseA", sand);
-			multiTextureMat->Set("u_Material.DiffuseB", grass); 
+			multiTextureMat->Set("u_Material.DiffuseB", grass);
 			multiTextureMat->Set("u_Material.Shininess", 0.5f);
-			multiTextureMat->Set("u_Scale", 0.1f); 
+			multiTextureMat->Set("u_Scale", 0.1f);
 		}
 
 		// Create some lights for our scene
@@ -481,7 +488,7 @@ void CreateScene() {
 		scene->Lights[4].Position = glm::vec3(-15.0f, -10.0f, 12.0f);
 		scene->Lights[4].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[4].Range = 100.0f;
-	
+
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -493,7 +500,7 @@ void CreateScene() {
 		sphere->GenerateMesh();
 
 		// Set up the scene's camera
-		GameObject::Sptr camera = scene->CreateGameObject("Main Camera"); 
+		GameObject::Sptr camera = scene->CreateGameObject("Main Camera");
 		{
 			camera->SetPostion(glm::vec3(12.760f, -10.420f, 6.0f));
 			camera->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
@@ -540,6 +547,21 @@ void CreateScene() {
 			// Add a dynamic rigid body to this monkey
 			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
 			//physics->AddCollider(ConvexMeshCollider::Create());
+		}
+
+		GameObject::Sptr cannonBall = scene->CreateGameObject("cannonBall");
+		{
+			cannonBall->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			cannonBall->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			cannonBall->SetScale(glm::vec3(1.f));
+
+			//Add a rigidbody to hit with force
+			cannonBall->Add<RigidBody>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = cannonBall->Add<RenderComponent>();
+			renderer->SetMesh(cannonBallMesh);
+			renderer->SetMaterial(cannonBallMaterial);
 		}
 
 		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
@@ -1151,6 +1173,10 @@ int main() {
 	float rotateTo = 0.0f, newRotate = 0.0f, goblinPos = 0.0f;
 	bool isButtonPressed = false, isRotate = false, rotateDir = false, newSpawn = false, isGameRunning = false, startUp = true;
 
+	//if shootTimer <= 0 can shoot, reset to shooTime
+	bool canShoot = true;
+	float shootTimer = 0.f, shootTime = 2.f;
+
 	spawn = rand() % 4 + 1;
 
 	
@@ -1161,6 +1187,7 @@ int main() {
 
 		Camera::Sptr camera = scene->MainCamera;
 		GameObject::Sptr goblin = scene->FindObjectByName("goblin1");
+		GameObject::Sptr cannonBall = scene->FindObjectByName("cannonBall");
 		GameObject::Sptr mainMenu = scene->FindObjectByName("Main Menu");
 		GameObject::Sptr mainMenuB1 = scene->FindObjectByName("Button1");
 		GameObject::Sptr mainMenuB2 = scene->FindObjectByName("Button2");
@@ -1424,6 +1451,8 @@ int main() {
 		//game systems
 		else if (isGameRunning == true)
 		{
+			if (shootTimer <= 0) canShoot = true;
+			else shootTimer -= dt;
 			if (menuType == 3)
 			{
 				if (glfwGetKey(window, GLFW_KEY_N)) //this is for the score counter change it to add score when enemy has been defeated
@@ -1594,6 +1623,32 @@ int main() {
 						camera->GetGameObject()->SetRotation(glm::vec3(90.0f, 0.0f, 360.0f));
 					}
 				}
+			}
+
+			//////Shooting///////
+			if (glfwGetKey(window, GLFW_KEY_SPACE) && canShoot) {
+				//shoot then reset wait timer
+				switch (lane)
+				{
+				case 1:
+					cannonBall->SetPostion(glm::vec3(12.760f, -9.f, 5.f));
+				/*	cannonBall->Get<RigidBody>()->Awake();
+					cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3(12.760, 11.0f, 1.f));*/
+					break;
+				case 2:
+					cannonBall->SetPostion(glm::vec3(11.f, -10.5f, 5.f));
+					break;
+				case 3:
+					cannonBall->SetPostion(glm::vec3(12.760f, -12.f, 5.f));
+					break;
+				case 4:
+					cannonBall->SetPostion(glm::vec3(14.f, -10.5f, 5.f));
+					break;
+				default:
+					break;
+				}
+				canShoot = false;
+				shootTimer = shootTime;
 			}
 
 			//////Enemy Spawning//////
