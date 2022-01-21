@@ -556,7 +556,8 @@ void CreateScene() {
 			cannonBall->SetScale(glm::vec3(1.f));
 
 			//Add a rigidbody to hit with force
-			cannonBall->Add<RigidBody>();
+			RigidBody::Sptr ballPhy = cannonBall->Add<RigidBody>(RigidBodyType::Dynamic);
+			ballPhy->SetMass(5.0f);
 
 			// Create and attach a renderer for the monkey
 			RenderComponent::Sptr renderer = cannonBall->Add<RenderComponent>();
@@ -1174,8 +1175,9 @@ int main() {
 	bool isButtonPressed = false, isRotate = false, rotateDir = false, newSpawn = false, isGameRunning = false, startUp = true;
 
 	//if shootTimer <= 0 can shoot, reset to shooTime
-	bool canShoot = true;
+	bool canShoot = true, charging = false;
 	float shootTimer = 0.f, shootTime = 2.f;
+	float shootPower = 5.0f;
 
 	spawn = rand() % 4 + 1;
 
@@ -1505,15 +1507,15 @@ int main() {
 				}
 			}
 
-			if (glfwGetKey(window, GLFW_KEY_SPACE))  //shooting button
-			{
-				if (!isButtonPressed)
-				{
+			//if (glfwGetKey(window, GLFW_KEY_SPACE))  //shooting button
+			//{
+				//if (!isButtonPressed)
+				//{
 
-				}
-				isButtonPressed = true;
-			}
-			else if (glfwGetKey(window, GLFW_KEY_A))
+				//}
+				//isButtonPressed = true;
+			//}
+			if (glfwGetKey(window, GLFW_KEY_A))
 			{
 				if (!isButtonPressed && !isRotate)
 				{
@@ -1628,27 +1630,50 @@ int main() {
 			//////Shooting///////
 			if (glfwGetKey(window, GLFW_KEY_SPACE) && canShoot) {
 				//shoot then reset wait timer
-				switch (lane)
+				if (shootPower < 70)
 				{
-				case 1:
-					cannonBall->SetPostion(glm::vec3(12.760f, -9.f, 5.f));
-				/*	cannonBall->Get<RigidBody>()->Awake();
-					cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3(12.760, 11.0f, 1.f));*/
-					break;
-				case 2:
-					cannonBall->SetPostion(glm::vec3(11.f, -10.5f, 5.f));
-					break;
-				case 3:
-					cannonBall->SetPostion(glm::vec3(12.760f, -12.f, 5.f));
-					break;
-				case 4:
-					cannonBall->SetPostion(glm::vec3(14.f, -10.5f, 5.f));
-					break;
-				default:
-					break;
+					shootPower += dt * 20.0f;
 				}
-				canShoot = false;
-				shootTimer = shootTime;
+				else
+				{
+					shootPower = 70.0f;
+				}
+				charging = true;
+			}
+			else
+			{
+				if (charging == true)
+				{
+					switch (lane)
+					{
+					case 1:
+						cannonBall->SetPostion(glm::vec3(12.760f, -9.f, 5.f));
+						cannonBall->Get<RigidBody>()->Awake();
+						cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3(0.0f, shootPower, 25.0f));
+						break;
+					case 2:
+						cannonBall->SetPostion(glm::vec3(11.f, -10.5f, 5.f));
+						cannonBall->Get<RigidBody>()->Awake();
+						cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3((-1 * shootPower), 0.0f, 25.0f));
+						break;
+					case 3:
+						cannonBall->SetPostion(glm::vec3(12.760f, -12.f, 5.f));
+						cannonBall->Get<RigidBody>()->Awake();
+						cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3(0.0f, (-1*shootPower), 25.0f));
+						break;
+					case 4:
+						cannonBall->SetPostion(glm::vec3(14.f, -10.5f, 5.f));
+						cannonBall->Get<RigidBody>()->Awake();
+						cannonBall->Get<RigidBody>()->ApplyImpulse(glm::vec3(shootPower, 0.0f, 25.0f));
+						break;
+					default:
+						break;
+					}
+					canShoot = false;
+					shootTimer = shootTime;
+					shootPower = 5.0f;
+					charging = false;
+				}
 			}
 
 			//////Enemy Spawning//////
