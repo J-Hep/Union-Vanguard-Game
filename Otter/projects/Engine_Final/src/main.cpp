@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <ctime>
+#include <stdlib.h>
 
 // GLM math library
 #include <GLM/glm.hpp>
@@ -259,6 +260,9 @@ void DrawMaterialsWindow() {
 /// <summary>
 /// handles creating or loading the scene
 /// </summary>
+
+int randomizedSkybox = 0;
+
 void CreateScene() {
 	bool loadScene = false;  
 	// For now we can use a toggle to generate our scene vs load from file
@@ -343,8 +347,45 @@ void CreateScene() {
 
 
 		// Here we'll load in the cubemap, as well as a special shader to handle drawing the skybox
-		TextureCube::Sptr testCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/ocean/ocean.jpg");
-		Shader::Sptr      skyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+		TextureCube::Sptr sampleCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/sample/sample.jpg");
+		Shader::Sptr      sampleSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});
+
+		TextureCube::Sptr oceanCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/ocean/ocean.jpg");
+		Shader::Sptr      oceanSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});
+
+		TextureCube::Sptr clearDayCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/clearDay/clearDay.jpg");
+		Shader::Sptr      clearDaySkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});
+
+		TextureCube::Sptr clearMorningCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/clearMorning/clearMorning.jpg");
+		Shader::Sptr      clearMorningSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});
+
+		TextureCube::Sptr clearNightCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/clearNight/clearNight.jpg");
+		Shader::Sptr      clearNightSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});
+		
+
+		/*TextureCube::Sptr morshuCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/morshuSky/morshu.jpg");
+		Shader::Sptr      morshuSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
+		});*/
+
+		TextureCube::Sptr settingCubemap = ResourceManager::CreateAsset<TextureCube>("cubemaps/setting/setting.jpg");
+		Shader::Sptr      settingSkyboxShader = ResourceManager::CreateAsset<Shader>(std::unordered_map<ShaderPartType, std::string>{
 			{ ShaderPartType::Vertex, "shaders/vertex_shaders/skybox_vert.glsl" },
 			{ ShaderPartType::Fragment, "shaders/fragment_shaders/skybox_frag.glsl" }
 		});
@@ -353,8 +394,23 @@ void CreateScene() {
 		scene = std::make_shared<Scene>();
 
 		// Setting up our enviroment map
-		scene->SetSkyboxTexture(testCubemap);
-		scene->SetSkyboxShader(skyboxShader);
+		 randomizedSkybox = rand() % 3 + 1;
+		std::cout << randomizedSkybox << std::endl;
+
+		switch (randomizedSkybox) {
+		case 1:
+			scene->SetSkyboxTexture(clearDayCubemap);
+			break;
+		case 2:
+			scene->SetSkyboxTexture(clearMorningCubemap);
+			break;
+		case 3:
+			scene->SetSkyboxTexture(clearNightCubemap);
+			break;
+		}
+
+		//scene->SetSkyboxTexture(clearMorningCubemap);
+		scene->SetSkyboxShader(sampleSkyboxShader);
 		// Since the skybox I used was for Y-up, we need to rotate it 90 deg around the X-axis to convert it to z-up
 		scene->SetSkyboxRotation(glm::rotate(MAT4_IDENTITY, glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f)));
 
@@ -1145,6 +1201,13 @@ int main() {
 
 	// The slot that we'll bind our instance level UBO to
 	const int INSTANCE_UBO_BINDING = 1;
+	//randomized seed
+	srand(time(NULL));
+
+
+	//randomized skybox
+	randomizedSkybox = rand() % 3 + 1;
+	std::cout << randomizedSkybox << std::endl;
 
 	////////////////////////////////
 	///// SCENE CREATION MOVED /////
@@ -1213,6 +1276,7 @@ int main() {
 		GameObject::Sptr loseMenu = scene->FindObjectByName("Lose");
 		GameObject::Sptr loseMenuScore = scene->FindObjectByName("FinalScoreL");
 		GameObject::Sptr loseMenuB1 = scene->FindObjectByName("Button10");
+
 
 		// Calculate the time since our last frame (dt)
 		double thisFrame = glfwGetTime();
