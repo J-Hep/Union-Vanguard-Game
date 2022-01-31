@@ -704,7 +704,8 @@ void CreateScene() {
 				transform->SetPosition(glm::vec2(300.0f, 300.0f));
 
 				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/PlayIdle.png"));				
+			    panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
 
 				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
 				font->Bake();
@@ -870,20 +871,91 @@ void CreateScene() {
 
 		GameObject::Sptr canvas3 = scene->CreateGameObject("inGameGUI");
 		{
-			RectTransform::Sptr transform = canvas3->Add<RectTransform>();
-			transform->SetMin({ 6, 10 });
-			transform->SetMax({ 110, 50 });
-			transform->SetPosition(glm::vec2(70.0f, 775.0f));
+			GameObject::Sptr subPanel1 = scene->CreateGameObject("Score");
+			{
+				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 110, 50 });
+				transform->SetPosition(glm::vec2(70.0f, 775.0f));
 
-			GuiPanel::Sptr canPanel = canvas3->Add<GuiPanel>();
-			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+				GuiPanel::Sptr canPanel = subPanel1->Add<GuiPanel>();
+				canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
 
-			Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
-			font->Bake();
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
 
-			GuiText::Sptr text = canvas3->Add<GuiText>();
-			text->SetText("0");
-			text->SetFont(font);
+				GuiText::Sptr text = subPanel1->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+			}
+			canvas3->AddChild(subPanel1);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Power Bar");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 180, 50 });
+				transform->SetPosition(glm::vec2(700.0f, 775.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Power");
+				text->SetFont(font);
+
+			}
+			canvas3->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Charge Level");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 0, 10 });
+				transform->SetMax({ 10, 20 });
+				transform->SetPosition(glm::vec2(630.0f, 780.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+			}
+			canvas3->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Health Bar");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 180, 50 });
+				transform->SetPosition(glm::vec2(100.0f, 30.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Tower Health");
+				text->SetFont(font);
+
+			}
+			canvas3->AddChild(subPanel4);
+
+			GameObject::Sptr subPanel5 = scene->CreateGameObject("Health Level");
+			{
+				RectTransform::Sptr transform = subPanel5->Add<RectTransform>();
+				transform->SetMin({ 0, 10 });
+				transform->SetMax({ 150, 20 });
+				transform->SetPosition(glm::vec2(100.0f, 35.0f));
+
+				GuiPanel::Sptr panel = subPanel5->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+				
+			}
+			canvas3->AddChild(subPanel5);
 		}
 
 		GameObject::Sptr canvas4 = scene->CreateGameObject("Pause Menu");
@@ -1231,7 +1303,7 @@ int main() {
 	int lane = 1, spawn = 1, menuSelect = 1, menuType = 1, score = 0;
 	//menuType 1 = main menu
 	//menuType 2 = settings
-	//menuType 3 = pause menu
+	//menuType 3 = pause menu/in game
 	//menuType 4 = win screen
 	//menuType 5 = lose screen
 	float rotateTo = 0.0f, newRotate = 0.0f, goblinPos = 0.0f;
@@ -1240,7 +1312,7 @@ int main() {
 	//if shootTimer <= 0 can shoot, reset to shooTime
 	bool canShoot = true, charging = false;
 	float shootTimer = 0.f, shootTime = 2.f;
-	float shootPower = 5.0f;
+	float shootPower = 5.0f, powerLevel = 0.0f, powerOffset = 630.0f;
 
 	spawn = rand() % 4 + 1;
 
@@ -1264,6 +1336,8 @@ int main() {
 		GameObject::Sptr settingsMenuB3 = scene->FindObjectByName("Button6");
 
 		GameObject::Sptr inGame = scene->FindObjectByName("inGameGUI");
+		GameObject::Sptr inGameScore = scene->FindObjectByName("Score");
+		GameObject::Sptr inGamePower = scene->FindObjectByName("Charge Level");
 
 		GameObject::Sptr pauseMenu = scene->FindObjectByName("Pause Menu");
 		GameObject::Sptr pauseMenuB1 = scene->FindObjectByName("Button7");
@@ -1307,6 +1381,7 @@ int main() {
 				else
 				{
 					mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+					//mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(1.0f));
 				}
 				if (menuSelect == 2)
 				{
@@ -1455,6 +1530,7 @@ int main() {
 						{
 							mainMenu->SetEnabled(false);
 							inGame->SetEnabled(true);
+							inGame->RenderGUI();
 							menuType = 3;
 							isGameRunning = true;
 						}
@@ -1492,6 +1568,7 @@ int main() {
 						{
 							pauseMenu->SetEnabled(false);
 							inGame->SetEnabled(true);
+							inGame->RenderGUI();
 							menuType = 3;
 							isGameRunning = true;
 						}
@@ -1526,7 +1603,7 @@ int main() {
 					if (!isButtonPressed)
 					{
 						score += 10;
-						inGame->Get<GuiText>()->SetText(std::to_string(score));
+						inGameScore->Get<GuiText>()->SetText(std::to_string(score));
 					}
 					isButtonPressed = true;
 				}
@@ -1697,12 +1774,19 @@ int main() {
 				if (shootPower < 70)
 				{
 					shootPower += dt * 20.0f;
+					powerOffset += dt * 21.5f;
 				}
 				else
 				{
 					shootPower = 70.0f;
 				}
 				charging = true;
+				powerLevel = (shootPower / 70);
+				inGamePower->Get<RectTransform>()->SetMin({ 0, 10 });
+				inGamePower->Get<RectTransform>()->SetMax({ 150 * powerLevel, 20 });
+				
+				inGamePower->Get<RectTransform>()->SetPosition(glm::vec2(powerOffset, 780.0f));
+				//150
 			}
 			else
 			{
@@ -1737,6 +1821,10 @@ int main() {
 					shootTimer = shootTime;
 					shootPower = 5.0f;
 					charging = false;
+					powerOffset = 630.0f;
+					inGamePower->Get<RectTransform>()->SetMin({ 0, 10 });
+					inGamePower->Get<RectTransform>()->SetMax({ 10, 20 });
+					inGamePower->Get<RectTransform>()->SetPosition(glm::vec2(630.0f, 780.0f));
 				}
 			}
 
