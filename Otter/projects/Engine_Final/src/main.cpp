@@ -1300,6 +1300,7 @@ int main() {
 
 	nlohmann::json editorSceneState;
 
+	int health = 100;
 	int lane = 1, spawn = 1, menuSelect = 1, menuType = 1, score = 0;
 	//menuType 1 = main menu
 	//menuType 2 = settings
@@ -1338,6 +1339,7 @@ int main() {
 		GameObject::Sptr inGame = scene->FindObjectByName("inGameGUI");
 		GameObject::Sptr inGameScore = scene->FindObjectByName("Score");
 		GameObject::Sptr inGamePower = scene->FindObjectByName("Charge Level");
+		GameObject::Sptr inGameHealth = scene->FindObjectByName("Health Level");
 
 		GameObject::Sptr pauseMenu = scene->FindObjectByName("Pause Menu");
 		GameObject::Sptr pauseMenuB1 = scene->FindObjectByName("Button7");
@@ -1533,6 +1535,7 @@ int main() {
 							inGame->RenderGUI();
 							menuType = 3;
 							isGameRunning = true;
+							scene->IsPlaying = true;
 						}
 						if (menuSelect == 2)
 						{
@@ -1619,18 +1622,6 @@ int main() {
 					}
 					isButtonPressed = true;
 				}
-				else if (glfwGetKey(window, GLFW_KEY_L)) //this is for the lose condition change it to trigger when needed
-				{
-					if (!isButtonPressed)
-					{
-						inGame->SetEnabled(false);
-						loseMenu->SetEnabled(true);
-						loseMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
-						isGameRunning = false;
-						menuType = 6;
-					}
-					isButtonPressed = true;
-				}
 				else if (glfwGetKey(window, GLFW_KEY_P))  //pause button
 				{
 					if (!isButtonPressed)
@@ -1648,14 +1639,6 @@ int main() {
 				}
 			}
 
-			//if (glfwGetKey(window, GLFW_KEY_SPACE))  //shooting button
-			//{
-				//if (!isButtonPressed)
-				//{
-
-				//}
-				//isButtonPressed = true;
-			//}
 			if (glfwGetKey(window, GLFW_KEY_A))
 			{
 				if (!isButtonPressed && !isRotate)
@@ -1922,6 +1905,27 @@ int main() {
 				}
 			default:
 				break;
+			}
+			//health decrements for now
+			if (goblin->GetPosX() <= 13.f && goblin->GetPosX() >= 11.f && goblin->GetPosY() <= -9.f && goblin->GetPosY() >= -11.f) {
+				health -= 10;
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				std::cout << health << std::endl;
+
+				float healthLevel = (health / 100);
+				inGameHealth->Get<RectTransform>()->SetMin({ 0, 10 });
+				inGameHealth->Get<RectTransform>()->SetMax({ 100.f * healthLevel, 20 });
+				inGameHealth->Get<RectTransform>()->SetPosition((glm::vec2(100.0f, 35.0f)));
+
+			}
+			if (health <= 0) {
+				std::cout << "Game end, you is ded\n";
+				inGame->SetEnabled(false);
+				winMenu->SetEnabled(true);
+				winMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
+				isGameRunning = false;
+				menuType = 5;
 			}
 		}
 		// Draw our material properties window!
