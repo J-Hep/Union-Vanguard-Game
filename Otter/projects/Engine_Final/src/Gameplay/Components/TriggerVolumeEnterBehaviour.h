@@ -23,6 +23,7 @@ public:
 	virtual nlohmann::json ToJson() const override;
 	static TriggerVolumeEnterBehaviour::Sptr FromJson(const nlohmann::json& blob);
 	MAKE_TYPENAME(TriggerVolumeEnterBehaviour);
+	bool triggerEntered();
 
 protected:
 	bool _playerInTrigger;

@@ -614,6 +614,14 @@ void CreateScene() {
 			//Add a rigidbody to hit with force
 			RigidBody::Sptr ballPhy = cannonBall->Add<RigidBody>(RigidBodyType::Dynamic);
 			ballPhy->SetMass(5.0f);
+			ballPhy->AddCollider(SphereCollider::Create(1.f))->SetPosition({0, 0, 0});
+			
+		  /*TriggerVolume::Sptr volume = cannonBall->Add<TriggerVolume>();
+			SphereCollider::Sptr collider = SphereCollider::Create(1.f);
+			collider->SetPosition(glm::vec3(0.f));
+			volume->AddCollider(collider);
+
+			cannonBall->Add<TriggerVolumeEnterBehaviour>();*/
 
 			// Create and attach a renderer for the monkey
 			RenderComponent::Sptr renderer = cannonBall->Add<RenderComponent>();
@@ -666,6 +674,15 @@ void CreateScene() {
 			RenderComponent::Sptr renderer = goblin1->Add<RenderComponent>();
 			renderer->SetMesh(goblinMesh);
 			renderer->SetMaterial(goblinMaterial);
+
+			//RigidBody::Sptr goblinRB = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+			//goblinRB->AddCollider(BoxCollider::Create())->SetPosition(glm::vec3(0.f));
+
+			TriggerVolume::Sptr volume = goblin1->Add<TriggerVolume>();
+			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
+			volume->AddCollider(col);
+
+			goblin1->Add<TriggerVolumeEnterBehaviour>();
 
 			// Add a dynamic rigid body to this monkey
 			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
@@ -1316,43 +1333,43 @@ int main() {
 	float shootPower = 5.0f, powerLevel = 0.0f, powerOffset = 630.0f;
 
 	spawn = rand() % 4 + 1;
-
 	
+	Camera::Sptr camera = scene->MainCamera;
+	GameObject::Sptr goblin = scene->FindObjectByName("goblin1");
+	GameObject::Sptr cannonBall = scene->FindObjectByName("cannonBall");
+	GameObject::Sptr mainMenu = scene->FindObjectByName("Main Menu");
+	GameObject::Sptr mainMenuB1 = scene->FindObjectByName("Button1");
+	GameObject::Sptr mainMenuB2 = scene->FindObjectByName("Button2");
+	GameObject::Sptr mainMenuB3 = scene->FindObjectByName("Button3");
+
+	GameObject::Sptr settingsMenu = scene->FindObjectByName("Settings Menu");
+	GameObject::Sptr settingsMenuB1 = scene->FindObjectByName("Button4");
+	GameObject::Sptr settingsMenuB2 = scene->FindObjectByName("Button5");
+	GameObject::Sptr settingsMenuB3 = scene->FindObjectByName("Button6");
+
+	GameObject::Sptr inGame = scene->FindObjectByName("inGameGUI");
+	GameObject::Sptr inGameScore = scene->FindObjectByName("Score");
+	GameObject::Sptr inGamePower = scene->FindObjectByName("Charge Level");
+	GameObject::Sptr inGameHealth = scene->FindObjectByName("Health Level");
+
+	GameObject::Sptr pauseMenu = scene->FindObjectByName("Pause Menu");
+	GameObject::Sptr pauseMenuB1 = scene->FindObjectByName("Button7");
+	GameObject::Sptr pauseMenuB2 = scene->FindObjectByName("Button8");
+
+	GameObject::Sptr winMenu = scene->FindObjectByName("Win");
+	GameObject::Sptr winMenuScore = scene->FindObjectByName("FinalScoreW");
+	GameObject::Sptr winMenuB1 = scene->FindObjectByName("Button9");
+
+	GameObject::Sptr loseMenu = scene->FindObjectByName("Lose");
+	GameObject::Sptr loseMenuScore = scene->FindObjectByName("FinalScoreL");
+	GameObject::Sptr loseMenuB1 = scene->FindObjectByName("Button10");
+
+	goblin->Get<TriggerVolumeEnterBehaviour>()->OnTriggerVolumeLeaving(cannonBall->Get<RigidBody>());
+
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		ImGuiHelper::StartFrame();
-
-		Camera::Sptr camera = scene->MainCamera;
-		GameObject::Sptr goblin = scene->FindObjectByName("goblin1");
-		GameObject::Sptr cannonBall = scene->FindObjectByName("cannonBall");
-		GameObject::Sptr mainMenu = scene->FindObjectByName("Main Menu");
-		GameObject::Sptr mainMenuB1 = scene->FindObjectByName("Button1");
-		GameObject::Sptr mainMenuB2 = scene->FindObjectByName("Button2");
-		GameObject::Sptr mainMenuB3 = scene->FindObjectByName("Button3");
-
-		GameObject::Sptr settingsMenu = scene->FindObjectByName("Settings Menu");
-		GameObject::Sptr settingsMenuB1 = scene->FindObjectByName("Button4");
-		GameObject::Sptr settingsMenuB2 = scene->FindObjectByName("Button5");
-		GameObject::Sptr settingsMenuB3 = scene->FindObjectByName("Button6");
-
-		GameObject::Sptr inGame = scene->FindObjectByName("inGameGUI");
-		GameObject::Sptr inGameScore = scene->FindObjectByName("Score");
-		GameObject::Sptr inGamePower = scene->FindObjectByName("Charge Level");
-		GameObject::Sptr inGameHealth = scene->FindObjectByName("Health Level");
-
-		GameObject::Sptr pauseMenu = scene->FindObjectByName("Pause Menu");
-		GameObject::Sptr pauseMenuB1 = scene->FindObjectByName("Button7");
-		GameObject::Sptr pauseMenuB2 = scene->FindObjectByName("Button8");
-
-		GameObject::Sptr winMenu = scene->FindObjectByName("Win");
-		GameObject::Sptr winMenuScore = scene->FindObjectByName("FinalScoreW");
-		GameObject::Sptr winMenuB1 = scene->FindObjectByName("Button9");
-
-		GameObject::Sptr loseMenu = scene->FindObjectByName("Lose");
-		GameObject::Sptr loseMenuScore = scene->FindObjectByName("FinalScoreL");
-		GameObject::Sptr loseMenuB1 = scene->FindObjectByName("Button10");
-
 
 		// Calculate the time since our last frame (dt)
 		double thisFrame = glfwGetTime();
@@ -1601,16 +1618,7 @@ int main() {
 			else shootTimer -= dt;
 			if (menuType == 3)
 			{
-				if (glfwGetKey(window, GLFW_KEY_N)) //this is for the score counter change it to add score when enemy has been defeated
-				{
-					if (!isButtonPressed)
-					{
-						score += 10;
-						inGameScore->Get<GuiText>()->SetText(std::to_string(score));
-					}
-					isButtonPressed = true;
-				}
-				else if (glfwGetKey(window, GLFW_KEY_K)) //this is for the win condition change it to trigger when needed
+				if (glfwGetKey(window, GLFW_KEY_K)) //this is for the win condition change it to trigger when needed
 				{
 					if (!isButtonPressed)
 					{
@@ -1925,7 +1933,14 @@ int main() {
 				winMenu->SetEnabled(true);
 				winMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
 				isGameRunning = false;
-				menuType = 5;
+				menuType = 6;
+			}
+			;
+			if (goblin->Get<TriggerVolumeEnterBehaviour>()->triggerEntered()) {
+				spawn = rand() % 4 + 1;
+				newSpawn = false;
+				score += 10;
+				inGameScore->Get<GuiText>()->SetText(std::to_string(score));
 			}
 		}
 		// Draw our material properties window!
