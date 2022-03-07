@@ -185,6 +185,9 @@ bool initGLAD() {
 	return true;
 }
 
+//Toggling debug
+bool debugMenuState = true; //Setting to false makes the world dark and breaks start menu
+
 /// <summary>
 /// Draws a widget for saving or loading our scene
 /// </summary>
@@ -248,15 +251,14 @@ bool DrawLightImGui(const Scene::Sptr& scene, const char* title, int ix) {
 /// <summary>
 /// Draws a simple window for displaying materials and their editors
 /// </summary>
-void DrawMaterialsWindow() {
-	if (ImGui::Begin("Materials")) {
-		ResourceManager::Each<Material>([](Material::Sptr material) {
-			material->RenderImGui();
-		});
+	void DrawMaterialsWindow() {
+		if (ImGui::Begin("Materials")) {
+			ResourceManager::Each<Material>([](Material::Sptr material) {
+				material->RenderImGui();
+				});
+		}
+		ImGui::End();
 	}
-	ImGui::End();
-}
-
 /// <summary>
 /// handles creating or loading the scene
 /// </summary>
@@ -328,12 +330,12 @@ void CreateScene() {
 		});
 
 		// Load in the meshes
-		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
-		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("FinalArea.obj");
-		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("TowerV1.obj");
-		MeshResource::Sptr cannonBallMesh = ResourceManager::CreateAsset<MeshResource>("Cannonball.obj");
-		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("goblinfullrig.obj");
-		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("CubeTester.fbx");
+		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("models/Monkey.obj");
+		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("models/FinalArea.obj");
+		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("models/TowerV1.obj");
+		MeshResource::Sptr cannonBallMesh = ResourceManager::CreateAsset<MeshResource>("models/Cannonball.obj");
+		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinfullrig.obj");
+		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("models/CubeTester.fbx");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
@@ -561,7 +563,8 @@ void CreateScene() {
 			camera->SetPostion(glm::vec3(12.760f, -10.420f, 6.0f));
 			camera->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 
-			camera->Add<SimpleCameraControl>();
+			//Reenable for click to drag camera
+			//camera->Add<SimpleCameraControl>();
 
 			Camera::Sptr cam = camera->Add<Camera>();
 			// Make sure that the camera is set as the scene's main camera!
@@ -1916,7 +1919,7 @@ int main() {
 			}
 			//health decrements for now
 			if (goblin->GetPosX() <= 13.f && goblin->GetPosX() >= 11.f && goblin->GetPosY() <= -9.f && goblin->GetPosY() >= -11.f) {
-				health -= 10;
+				health -= 25; //10 is too slow
 				spawn = rand() % 4 + 1;
 				newSpawn = false;
 				std::cout << health << std::endl;
@@ -1930,8 +1933,8 @@ int main() {
 			if (health <= 0) {
 				std::cout << "Game end, you is ded\n";
 				inGame->SetEnabled(false);
-				winMenu->SetEnabled(true);
-				winMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
+				loseMenu->SetEnabled(true);
+				loseMenuScore->Get<GuiText>()->SetText("Final Score: " + std::to_string(score));
 				isGameRunning = false;
 				menuType = 6;
 			}
@@ -1943,87 +1946,108 @@ int main() {
 				inGameScore->Get<GuiText>()->SetText(std::to_string(score));
 			}
 		}
-		// Draw our material properties window!
-		DrawMaterialsWindow();
+
+		//DEBUGGING MENU AREA
 
 		// Showcasing how to use the imGui library!
-		bool isDebugWindowOpen = ImGui::Begin("Debugging");
-		if (isDebugWindowOpen) {
-			// Draws a button to control whether or not the game is currently playing
-			static char buttonLabel[64];
-			sprintf_s(buttonLabel, "%s###playmode", scene->IsPlaying ? "Exit Play Mode" : "Enter Play Mode");
-			if (ImGui::Button(buttonLabel)) {
-				// Save scene so it can be restored when exiting play mode
-				if (!scene->IsPlaying) {
-					editorSceneState = scene->ToJson();
+
+		if (debugMenuState == true) {
+			// Draw our material properties window!
+			DrawMaterialsWindow();
+		}
+
+		if (debugMenuState == true) {
+
+			bool isDebugWindowOpen = ImGui::Begin("Debugging");
+
+			//useful but not needed information
+			//ImGui::ShowMetricsWindow();
+
+
+			if (isDebugWindowOpen) {
+				// Draws a button to control whether or not the game is currently playing
+				static char buttonLabel[64];
+				sprintf_s(buttonLabel, "%s###playmode", scene->IsPlaying ? "Exit Play Mode" : "Enter Play Mode");
+				if (ImGui::Button(buttonLabel)) {
+					// Save scene so it can be restored when exiting play mode
+					if (!scene->IsPlaying) {
+						editorSceneState = scene->ToJson();
+					}
+
+					// Toggle state
+					scene->IsPlaying = !scene->IsPlaying;
+
+					// If we've gone from playing to not playing, restore the state from before we started playing
+					if (!scene->IsPlaying) {
+						scene = nullptr;
+						// We reload to scene from our cached state
+						scene = Scene::FromJson(editorSceneState);
+						// Don't forget to reset the scene's window and wake all the objects!
+						scene->Window = window;
+						scene->Awake();
+					}
 				}
 
-				// Toggle state
-				scene->IsPlaying = !scene->IsPlaying;
+				// Make a new area for the scene saving/loading
+				ImGui::Separator();
+				if (DrawSaveLoadImGui(scene, scenePath)) {
+					// C++ strings keep internal lengths which can get annoying
+					// when we edit it's underlying datastore, so recalcualte size
+					scenePath.resize(strlen(scenePath.c_str()));
 
-				// If we've gone from playing to not playing, restore the state from before we started playing
-				if (!scene->IsPlaying) {
-					scene = nullptr;
-					// We reload to scene from our cached state
-					scene = Scene::FromJson(editorSceneState);
-					// Don't forget to reset the scene's window and wake all the objects!
+					// We have loaded a new scene, call awake to set
+					// up all our components
 					scene->Window = window;
 					scene->Awake();
 				}
-			}
-
-			// Make a new area for the scene saving/loading
-			ImGui::Separator();
-			if (DrawSaveLoadImGui(scene, scenePath)) {
-				// C++ strings keep internal lengths which can get annoying
-				// when we edit it's underlying datastore, so recalcualte size
-				scenePath.resize(strlen(scenePath.c_str()));
-
-				// We have loaded a new scene, call awake to set
-				// up all our components
-				scene->Window = window;
-				scene->Awake();
-			}
-			ImGui::Separator();
-			// Draw a dropdown to select our physics debug draw mode
-			if (BulletDebugDraw::DrawModeGui("Physics Debug Mode:", physicsDebugMode)) {
-				scene->SetPhysicsDebugDrawMode(physicsDebugMode);
-			}
-			LABEL_LEFT(ImGui::SliderFloat, "Playback Speed:    ", &playbackSpeed, 0.0f, 10.0f);
-			ImGui::Separator();
-		}
-
-		// Clear the color and depth buffers
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		ImGui::Text("Lane: %d", lane);
-		ImGui::Separator();
-
-		// Draw some ImGui stuff for the lights
-		if (isDebugWindowOpen) {
-			for (int ix = 0; ix < scene->Lights.size(); ix++) {
-				char buff[256];
-				sprintf_s(buff, "Light %d##%d", ix, ix);
-				// DrawLightImGui will return true if the light was deleted
-				if (DrawLightImGui(scene, buff, ix)) {
-					// Remove light from scene, restore all lighting data
-					scene->Lights.erase(scene->Lights.begin() + ix);
-					scene->SetupShaderAndLights();
-					// Move back one element so we don't skip anything!
-					ix--;
+				ImGui::Separator();
+				// Draw a dropdown to select our physics debug draw mode
+				if (BulletDebugDraw::DrawModeGui("Physics Debug Mode:", physicsDebugMode)) {
+					scene->SetPhysicsDebugDrawMode(physicsDebugMode);
 				}
+				LABEL_LEFT(ImGui::SliderFloat, "Playback Speed:    ", &playbackSpeed, 0.0f, 10.0f);
+				ImGui::Separator();
 			}
-			// As long as we don't have max lights, draw a button
-			// to add another one
-			if (scene->Lights.size() < scene->MAX_LIGHTS) {
-				if (ImGui::Button("Add Light")) {
-					scene->Lights.push_back(Light());
-					scene->SetupShaderAndLights();
-				}
-			}
-			// Split lights from the objects in ImGui
+
+
+			// Clear the color and depth buffers
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			ImGui::Text("Lane: %d", lane);
 			ImGui::Separator();
+
+			// Draw some ImGui stuff for the lights
+			if (isDebugWindowOpen) {
+				for (int ix = 0; ix < scene->Lights.size(); ix++) {
+					char buff[256];
+					sprintf_s(buff, "Light %d##%d", ix, ix);
+					// DrawLightImGui will return true if the light was deleted
+					if (DrawLightImGui(scene, buff, ix)) {
+						// Remove light from scene, restore all lighting data
+						scene->Lights.erase(scene->Lights.begin() + ix);
+						scene->SetupShaderAndLights();
+						// Move back one element so we don't skip anything!
+						ix--;
+					}
+				}
+				// As long as we don't have max lights, draw a button
+				// to add another one
+				if (scene->Lights.size() < scene->MAX_LIGHTS) {
+					if (ImGui::Button("Add Light")) {
+						scene->Lights.push_back(Light());
+						scene->SetupShaderAndLights();
+					}
+				}
+				// Split lights from the objects in ImGui
+				ImGui::Separator();
+			}
+
+			// Draw object GUIs
+			if (isDebugWindowOpen) {
+				scene->DrawAllGameObjectGUIs();
+			}
 		}
+	
 
 		dt *= playbackSpeed;
 
@@ -2040,10 +2064,9 @@ int main() {
 		// Update our worlds physics!
 		scene->DoPhysics(dt);
 
-		// Draw object GUIs
-		if (isDebugWindowOpen) {
-			scene->DrawAllGameObjectGUIs();
-		}
+		
+
+		
 		
 		// The current material that is bound for rendering
 		Material::Sptr currentMat = nullptr;
@@ -2148,8 +2171,10 @@ int main() {
 		glDepthMask(GL_TRUE);
 
 		// End our ImGui window
-		ImGui::End();
-
+		
+		if (debugMenuState == true) {
+			ImGui::End();
+		}
 		VertexArrayObject::Unbind();
 
 		lastFrame = thisFrame;
