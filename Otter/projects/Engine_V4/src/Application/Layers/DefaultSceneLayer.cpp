@@ -381,8 +381,12 @@ void DefaultSceneLayer::_CreateScene()
 		sphere->GenerateMesh();
 
 		//Parents for organization
-		GameObject::Sptr defaultsParent = scene->CreateGameObject("Defaults");
-		GameObject::Sptr mapParent = scene->CreateGameObject("Map");
+		GameObject::Sptr defaultsParent = scene->CreateGameObject("Defaults"); {
+			defaultsParent->SetPostion(glm::vec3(0.0f,0.0f,0.0f));
+		}
+		GameObject::Sptr mapParent = scene->CreateGameObject("Map"); {
+
+		}
 		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
 		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
 		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
