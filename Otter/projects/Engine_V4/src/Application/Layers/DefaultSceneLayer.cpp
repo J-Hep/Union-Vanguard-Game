@@ -136,8 +136,15 @@ void DefaultSceneLayer::_CreateScene()
 
 #pragma region Loading Assets
 		// Load in the meshes
-		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("Monkey.obj");
-		MeshResource::Sptr shipMesh   = ResourceManager::CreateAsset<MeshResource>("fenrir.obj");
+		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("models/Monkey.obj");
+		MeshResource::Sptr shipMesh   = ResourceManager::CreateAsset<MeshResource>("models/fenrir.obj");
+
+		//Our 3d assets
+		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("models/FinalArea.obj");
+		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("models/TowerV1.obj");
+		MeshResource::Sptr cannonBallMesh = ResourceManager::CreateAsset<MeshResource>("models/Cannonball.obj");
+		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinfullrig.obj");
+		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("models/CubeTester.fbx");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
@@ -146,6 +153,10 @@ void DefaultSceneLayer::_CreateScene()
 		Texture2D::Sptr    leafTex      = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
+
+		//our texture assets
+		Texture2D::Sptr    gardenTowerTexture = ResourceManager::CreateAsset<Texture2D>("textures/YYY5.png");
+		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
 
 #pragma endregion
 
@@ -293,6 +304,29 @@ void DefaultSceneLayer::_CreateScene()
 			multiTextureMat->Set("u_Material.Shininess", 0.5f);
 			multiTextureMat->Set("u_Scale", 0.1f); 
 		}
+
+		//Our materials
+		Material::Sptr gardenTowerMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			gardenTowerMaterial->Name = "GardenTowerMat";
+			gardenTowerMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			gardenTowerMaterial->Set("u_Material.Shininess", 0.1f);
+		}
+
+		Material::Sptr cannonBallMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			cannonBallMaterial->Name = "CannonBallMat";
+			cannonBallMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			cannonBallMaterial->Set("u_Material.Shininess", 0.1f);
+		}
+
+		Material::Sptr goblinMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			goblinMaterial->Name = "Goblin";
+			goblinMaterial->Set("u_Material.Diffuse", goblinTex);
+			goblinMaterial->Set("u_Material.Shininess", 0.1f);
+		}
+
 #pragma endregion
 
 #pragma region Lights Camera Action
@@ -346,7 +380,18 @@ void DefaultSceneLayer::_CreateScene()
 		sphere->AddParam(MeshBuilderParam::CreateIcoSphere(ZERO, ONE, 5));
 		sphere->GenerateMesh();
 
+		//Parents for organization
+		GameObject::Sptr defaultsParent = scene->CreateGameObject("Defaults"); {
+			defaultsParent->SetPostion(glm::vec3(0.0f,0.0f,0.0f));
+		}
+		GameObject::Sptr mapParent = scene->CreateGameObject("Map"); {
 
+		}
+		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
+		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
+		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
+
+		gameObjectsParent->AddChild(enemiesParent);
 
 		// Set up all our sample objects
 		GameObject::Sptr plane = scene->CreateGameObject("Plane");
@@ -364,6 +409,611 @@ void DefaultSceneLayer::_CreateScene()
 			// Attach a plane collider that extends infinitely along the X/Y axis
 			RigidBody::Sptr physics = plane->Add<RigidBody>(/*static by default*/);
 			physics->AddCollider(BoxCollider::Create(glm::vec3(50.0f, 50.0f, 1.0f)))->SetPosition({ 0,0,-1 });
+
+			defaultsParent->AddChild(plane);
+		}
+
+		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
+		{
+			// Set position in the scene
+			towerGarden->SetPostion(glm::vec3(-118.0f, -154.0f, -4.0f));
+			towerGarden->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+			RenderComponent::Sptr renderer = towerGarden->Add<RenderComponent>();
+			renderer->SetMesh(towerGardenMesh);
+			renderer->SetMaterial(gardenTowerMaterial);
+			
+			mapParent->AddChild(towerGarden);
+		}
+
+		GameObject::Sptr cannonBall = scene->CreateGameObject("cannonBall");
+		{
+			cannonBall->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			cannonBall->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			cannonBall->SetScale(glm::vec3(1.f));
+
+			//Add a rigidbody to hit with force
+			RigidBody::Sptr ballPhy = cannonBall->Add<RigidBody>(RigidBodyType::Dynamic);
+			ballPhy->SetMass(5.0f);
+			ballPhy->AddCollider(SphereCollider::Create(1.f))->SetPosition({ 0, 0, 0 });
+
+			/*TriggerVolume::Sptr volume = cannonBall->Add<TriggerVolume>();
+			  SphereCollider::Sptr collider = SphereCollider::Create(1.f);
+			  collider->SetPosition(glm::vec3(0.f));
+			  volume->AddCollider(collider);
+
+			  cannonBall->Add<TriggerVolumeEnterBehaviour>();*/
+
+			  // Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = cannonBall->Add<RenderComponent>();
+			renderer->SetMesh(cannonBallMesh);
+			renderer->SetMaterial(cannonBallMaterial);
+
+			gameObjectsParent->AddChild(cannonBall);
+		}
+
+		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
+		{
+			towerCannon->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			towerCannon->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = towerCannon->Add<RenderComponent>();
+			renderer->SetMesh(towerCannonMesh);
+			renderer->SetMaterial(gardenTowerMaterial);
+			mapParent->AddChild(towerCannon);
+		}
+
+		GameObject::Sptr towerSpears = scene->CreateGameObject("towerSpears");
+		{
+			towerSpears->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			towerSpears->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = towerSpears->Add<RenderComponent>();
+			renderer->SetMesh(spearMesh);
+			renderer->SetMaterial(goblinMaterial);
+
+			mapParent->AddChild(towerSpears);
+
+		}
+
+
+
+		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
+		{
+			// Set position in the scene
+			goblin1->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+			goblin1->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+			goblin1->SetScale(glm::vec3(0.7f));
+
+			// Add some behaviour that relies on the physics body
+			//towerGarden->Add<JumpBehaviour>();
+
+			// Create and attach a renderer for the monkey
+			RenderComponent::Sptr renderer = goblin1->Add<RenderComponent>();
+			renderer->SetMesh(goblinMesh);
+			renderer->SetMaterial(goblinMaterial);
+
+			//RigidBody::Sptr goblinRB = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+			//goblinRB->AddCollider(BoxCollider::Create())->SetPosition(glm::vec3(0.f));
+
+			TriggerVolume::Sptr volume = goblin1->Add<TriggerVolume>();
+			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
+			volume->AddCollider(col);
+
+			goblin1->Add<TriggerVolumeEnterBehaviour>();
+
+			// Add a dynamic rigid body to this monkey
+			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
+			//physics->AddCollider(ConvexMeshCollider::Create());
+
+			enemiesParent->AddChild(goblin1);
+
+		}
+		
+
+#pragma endregion
+
+#pragma region UI creation
+
+		/////////////////////////// UI //////////////////////////////
+		GameObject::Sptr canvas = scene->CreateGameObject("Main Menu");
+		{
+			RectTransform::Sptr transform = canvas->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel = scene->CreateGameObject("Button1");
+			{
+				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 300.0f));
+
+				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
+				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/PlayIdle.png"));				
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel->Add<GuiText>();
+				text->SetText("Play");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button2");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Settings");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button3");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Vanguard");
+				text->SetFont(font);
+
+			}
+			canvas->AddChild(subPanel4);
+
+			uiParent->AddChild(canvas);
+		}
+
+		GameObject::Sptr canvas2 = scene->CreateGameObject("Settings Menu");
+		{
+			RectTransform::Sptr transform = canvas2->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas2->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel = scene->CreateGameObject("Button4");
+			{
+				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 300.0f));
+
+				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel->Add<GuiText>();
+				text->SetText("Settings stuff");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button5");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("More Settings");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button6");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Back");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Settings Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Settings");
+				text->SetFont(font);
+
+			}
+			canvas2->AddChild(subPanel4);
+			uiParent->AddChild(canvas2);
+		}
+
+		GameObject::Sptr canvas3 = scene->CreateGameObject("inGameGUI");
+		{
+			GameObject::Sptr subPanel1 = scene->CreateGameObject("Score");
+			{
+				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 110, 50 });
+				transform->SetPosition(glm::vec2(70.0f, 775.0f));
+
+				GuiPanel::Sptr canPanel = subPanel1->Add<GuiPanel>();
+				canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel1->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+			}
+			canvas3->AddChild(subPanel1);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Power Bar");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 180, 50 });
+				transform->SetPosition(glm::vec2(700.0f, 775.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Power");
+				text->SetFont(font);
+
+			}
+			canvas3->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Charge Level");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 0, 10 });
+				transform->SetMax({ 10, 20 });
+				transform->SetPosition(glm::vec2(630.0f, 780.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+			}
+			canvas3->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Health Bar");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 6, 10 });
+				transform->SetMax({ 180, 50 });
+				transform->SetPosition(glm::vec2(100.0f, 30.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Tower Health");
+				text->SetFont(font);
+
+			}
+			canvas3->AddChild(subPanel4);
+
+			GameObject::Sptr subPanel5 = scene->CreateGameObject("Health Level");
+			{
+				RectTransform::Sptr transform = subPanel5->Add<RectTransform>();
+				transform->SetMin({ 0, 10 });
+				transform->SetMax({ 150, 20 });
+				transform->SetPosition(glm::vec2(100.0f, 35.0f));
+
+				GuiPanel::Sptr panel = subPanel5->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+
+			}
+			canvas3->AddChild(subPanel5);
+			uiParent->AddChild(canvas3);
+		}
+
+		GameObject::Sptr canvas4 = scene->CreateGameObject("Pause Menu");
+		{
+			RectTransform::Sptr transform = canvas4->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas4->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Button7");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button8");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Resume");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Paused Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("Paused");
+				text->SetFont(font);
+
+			}
+			canvas4->AddChild(subPanel4);
+			uiParent->AddChild(canvas4);
+		}
+
+		GameObject::Sptr canvas5 = scene->CreateGameObject("Win");
+		{
+			RectTransform::Sptr transform = canvas5->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas5->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("FinalScoreW");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button9");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Win Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("YOU WIN!");
+				text->SetFont(font);
+
+			}
+			canvas5->AddChild(subPanel4);
+			uiParent->AddChild(canvas5);
+		}
+
+		GameObject::Sptr canvas6 = scene->CreateGameObject("Lose");
+		{
+			RectTransform::Sptr transform = canvas6->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+
+			GuiPanel::Sptr canPanel = canvas6->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("FinalScoreL");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 450.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("0");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Button10");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("Exit Game");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel3);
+
+			GameObject::Sptr subPanel4 = scene->CreateGameObject("Win Title");
+			{
+				RectTransform::Sptr transform = subPanel4->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel4->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel4->Add<GuiText>();
+				text->SetText("GAME OVER!");
+				text->SetFont(font);
+
+			}
+			canvas6->AddChild(subPanel4);
+			uiParent->AddChild(canvas6);
 		}
 
 #pragma endregion
