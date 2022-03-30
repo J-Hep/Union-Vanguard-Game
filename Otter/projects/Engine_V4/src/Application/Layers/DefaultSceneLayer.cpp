@@ -49,6 +49,8 @@
 #include "Gameplay/Components/TriggerVolumeEnterBehaviour.h"
 #include "Gameplay/Components/SimpleCameraControl.h"
 
+#include "Gameplay/Components/EnemyMovement.h"
+
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
 #include "Gameplay/Physics/Colliders/BoxCollider.h"
@@ -381,12 +383,13 @@ void DefaultSceneLayer::_CreateScene()
 		// Set up the scene's camera
 		GameObject::Sptr camera = scene->MainCamera->GetGameObject()->SelfRef();
 		{
-			camera->SetPostion({ 0, 0, 5 }); //-9,-6,15
-			camera->SetRotation(glm::vec3(90.0f,0.f,0.0f));
+			camera->SetPostion({ 2.75, 0, 5 }); //-9,-6,15 ; 2.75, 0, 5 
+			camera->SetRotation(glm::vec3(50.0f,0.f,-90.0f)); //90, 0,0 
 			//camera->LookAt(glm::vec3(0.0f));
 
 			//Need to create a camera controller for gameplay
 			camera->Add<SimpleCameraControl>();
+
 
 			// This is now handled by scene itself!
 			//Camera::Sptr cam = camera->Add<Camera>();
@@ -416,7 +419,9 @@ void DefaultSceneLayer::_CreateScene()
 		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
 		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
 		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
+		GameObject::Sptr cameraOffset = scene->CreateGameObject("Camera Offset");
 
+		cameraOffset->AddChild(camera);
 		gameObjectsParent->AddChild(enemiesParent);
 
 		// Set up all our sample objects
@@ -529,7 +534,6 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 
-
 		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
 		{
 			// Set position in the scene
@@ -553,6 +557,8 @@ void DefaultSceneLayer::_CreateScene()
 			volume->AddCollider(col);
 
 			goblin1->Add<TriggerVolumeEnterBehaviour>();
+			goblin1->Add<EnemyMovement>();
+			
 
 			// Add a dynamic rigid body to this monkey
 			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
