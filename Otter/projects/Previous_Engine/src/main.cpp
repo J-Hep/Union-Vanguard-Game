@@ -682,7 +682,7 @@ void CreateScene() {
 			//goblinRB->AddCollider(BoxCollider::Create())->SetPosition(glm::vec3(0.f));
 
 			TriggerVolume::Sptr volume = goblin1->Add<TriggerVolume>();
-			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
+			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.5f, 1.f));
 			volume->AddCollider(col);
 
 			goblin1->Add<TriggerVolumeEnterBehaviour>();
