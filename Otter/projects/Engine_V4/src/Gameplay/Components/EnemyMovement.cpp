@@ -8,6 +8,7 @@ void EnemyMovement::Awake()
 {
 	_body = GetComponent<Gameplay::Physics::RigidBody>();
 	if (_body == nullptr) {
+		std::cout << "enemy is not enabled\n";
 		IsEnabled = false;
 	}
 }
@@ -49,5 +50,6 @@ void EnemyMovement::Update(float deltaTime) {
 void EnemyMovement::OnEnteredTrigger(const std::shared_ptr<Gameplay::Physics::TriggerVolume>& trigger) {
 	//increase score
 	//destroy object
+	//_body->GetGameObject()->GetScene()->RemoveGameObject(this); //(?) supposed to call remove game object but not sure how
 	_body->IsEnabled = false;
 }

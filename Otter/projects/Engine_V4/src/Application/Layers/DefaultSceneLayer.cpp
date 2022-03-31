@@ -561,8 +561,8 @@ void DefaultSceneLayer::_CreateScene()
 			
 
 			// Add a dynamic rigid body to this monkey
-			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
-			//physics->AddCollider(ConvexMeshCollider::Create());
+			RigidBody::Sptr physics = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+			physics->AddCollider(ConvexMeshCollider::Create());
 
 			enemiesParent->AddChild(goblin1);
 
