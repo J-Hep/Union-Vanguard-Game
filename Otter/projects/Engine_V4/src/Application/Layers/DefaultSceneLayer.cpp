@@ -22,6 +22,8 @@
 #include "Graphics/GuiBatcher.h"
 #include "Graphics/Framebuffer.h"
 
+
+
 // Utilities
 #include "Utils/MeshBuilder.h"
 #include "Utils/MeshFactory.h"
@@ -32,6 +34,7 @@
 #include "Utils/JsonGlmHelpers.h"
 #include "Utils/StringUtils.h"
 #include "Utils/GlmDefines.h"
+#include "ToneFire.h"
 
 // Gameplay
 #include "Gameplay/Material.h"
@@ -48,8 +51,8 @@
 #include "Gameplay/Components/MaterialSwapBehaviour.h"
 #include "Gameplay/Components/TriggerVolumeEnterBehaviour.h"
 #include "Gameplay/Components/SimpleCameraControl.h"
-
 #include "Gameplay/Components/EnemyMovement.h"
+#include "Gameplay/Components/AudioEngine.h"
 
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
@@ -76,7 +79,7 @@ DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
 {
 	Name = "Default Scene";
-	Overrides = AppLayerFunctions::OnAppLoad;
+	Overrides = AppLayerFunctions::OnAppLoad | AppLayerFunctions::OnUpdate;
 }
 
 DefaultSceneLayer::~DefaultSceneLayer() = default;
@@ -84,6 +87,29 @@ DefaultSceneLayer::~DefaultSceneLayer() = default;
 void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 	_CreateScene();
 }
+
+
+double preFrame = glfwGetTime();
+void DefaultSceneLayer::OnUpdate()
+{
+
+	Application& app = Application::Get();
+	currScene = app.CurrentScene();
+
+	double currFrame = glfwGetTime();
+	float dt = static_cast<float>(currFrame - preFrame);
+
+	playBackground = true;
+
+	if (playBackground == true)
+	{
+		AudioEngine::playEvents("event:/Daytime Song");
+	}
+
+}
+
+
+
 
 void DefaultSceneLayer::_CreateScene()
 {
