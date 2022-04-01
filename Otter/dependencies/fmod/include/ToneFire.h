@@ -10,10 +10,10 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "FMOD/fmod.hpp"
-#include "FMOD/fmod_errors.h"
-#include "FMOD/fmod_studio.hpp"
-#include "FMOD/fmod_studio_common.h"
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#include "fmod_studio.hpp"
+#include "fmod_studio_common.h"
 namespace ToneFire {
 	class DLL FMODStudio;
 	class DLL FMODCore;

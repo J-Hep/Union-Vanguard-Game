@@ -9,6 +9,7 @@
 #include <GLM/gtx/common.hpp> // for fmod (floating modulus)
 
 #include <filesystem>
+#include "Application/Timing.h"
 
 // Graphics
 #include "Graphics/Buffers/IndexBuffer.h"
@@ -99,13 +100,26 @@ void DefaultSceneLayer::OnUpdate()
 	double currFrame = glfwGetTime();
 	float dt = static_cast<float>(currFrame - preFrame);
 
-	playBackground = true;
-
-	if (playBackground == true)
+	if (!start)
 	{
-		AudioEngine::playEvents("event:/Daytime Song");
+		if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)
+		{
+			sPressed = true;
+			currScene->IsPlaying = true;
+
+		}
+
+		
+		if (sPressed)
+		{
+			start = true;
+			sPressed = false;
+			AudioEngine::playEvents("event:/Daytime Song");
+		}
 	}
 
+
+	
 }
 
 

@@ -69,10 +69,10 @@ void AudioEngine::loadSound(const std::string& soundName, const std::string& fil
 
 void AudioEngine::loadBanks()
 {
-	studio.LoadBank("MainStage.bank");
-	studio.LoadBank("MainStage.strings.bank");
-
-
+	studio.LoadBank("Master.bank");
+	studio.LoadBank("Master.strings.bank");
+	studio.LoadBank("Background_Music.bank");
+	studio.LoadBank("Enemy_Sounds.bank");
 }
 
 void AudioEngine::unloadSound(const std::string& soundName)

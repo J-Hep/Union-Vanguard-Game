@@ -5,6 +5,7 @@
 #include "Utils/Macros.h"
 #include "Application/ApplicationLayer.h"
 #include "Gameplay/Scene.h"
+#include "Gameplay/MeshResource.h"
 
 struct GLFWwindow;
 
