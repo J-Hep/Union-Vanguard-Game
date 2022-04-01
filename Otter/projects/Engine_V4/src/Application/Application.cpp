@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <fmod_studio.hpp>
+
 
 #include "Logging.h"
 #include "Gameplay/InputEngine.h"
@@ -12,6 +14,7 @@
 #include "Utils/FileHelpers.h"
 #include "Utils/ResourceManager/ResourceManager.h"
 #include "Utils/ImGuiHelper.h"
+#include "ToneFire.h"
 
 // Graphics
 #include "Graphics/Buffers/IndexBuffer.h"
@@ -43,6 +46,11 @@
 #include "Gameplay/Components/SimpleCameraControl.h"
 #include "Gameplay/Components/ParticleSystem.h"
 #include "Gameplay/Components/Light.h"
+#include "Gameplay/Components/EnemyMovement.h"
+
+// Audio
+#include "Gameplay/Components/AudioEngine.h"
+#include "Gameplay/Components/common.h"
 
 // GUI
 #include "Gameplay/Components/GUI/RectTransform.h"
@@ -71,7 +79,7 @@ Application::Application() :
 	_windowSize({DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT}),
 	_isRunning(false),
 	_isEditor(true),
-	_windowTitle("INFR - 2350U"),
+	_windowTitle("Vanguard"),
 	_currentScene(nullptr),
 	_targetScene(nullptr)
 { }
@@ -145,6 +153,12 @@ void Application::SaveSettings()
 
 void Application::_Run()
 {
+
+	//Loading Audio Banks/Events
+	AudioEngine::loadBanks();
+	AudioEngine::loadEvents();
+
+
 	// TODO: Register layers
 	_layers.push_back(std::make_shared<GLAppLayer>());
 	_layers.push_back(std::make_shared<DefaultSceneLayer>());
@@ -184,6 +198,10 @@ void Application::_Run()
 
 	// Infinite loop as long as the application is running
 	while (_isRunning) {
+
+		//Updating Audio Engine
+		AudioEngine::studioupdate();
+
 		// Handle scene switching
 		if (_targetScene != nullptr) {
 			_HandleSceneChange();
@@ -272,6 +290,8 @@ void Application::_RegisterClasses()
 	ComponentManager::RegisterType<GuiText>();
 	ComponentManager::RegisterType<ParticleSystem>();
 	ComponentManager::RegisterType<Light>();
+
+	ComponentManager::RegisterType<EnemyMovement>();
 }
 
 void Application::_Load() {

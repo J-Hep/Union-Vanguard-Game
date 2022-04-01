@@ -9,6 +9,7 @@
 #include <GLM/gtx/common.hpp> // for fmod (floating modulus)
 
 #include <filesystem>
+#include "Application/Timing.h"
 
 // Graphics
 #include "Graphics/Buffers/IndexBuffer.h"
@@ -22,6 +23,8 @@
 #include "Graphics/GuiBatcher.h"
 #include "Graphics/Framebuffer.h"
 
+
+
 // Utilities
 #include "Utils/MeshBuilder.h"
 #include "Utils/MeshFactory.h"
@@ -32,6 +35,7 @@
 #include "Utils/JsonGlmHelpers.h"
 #include "Utils/StringUtils.h"
 #include "Utils/GlmDefines.h"
+#include "ToneFire.h"
 
 // Gameplay
 #include "Gameplay/Material.h"
@@ -48,6 +52,8 @@
 #include "Gameplay/Components/MaterialSwapBehaviour.h"
 #include "Gameplay/Components/TriggerVolumeEnterBehaviour.h"
 #include "Gameplay/Components/SimpleCameraControl.h"
+#include "Gameplay/Components/EnemyMovement.h"
+#include "Gameplay/Components/AudioEngine.h"
 
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
@@ -74,7 +80,7 @@ DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
 {
 	Name = "Default Scene";
-	Overrides = AppLayerFunctions::OnAppLoad;
+	Overrides = AppLayerFunctions::OnAppLoad | AppLayerFunctions::OnUpdate;
 }
 
 DefaultSceneLayer::~DefaultSceneLayer() = default;
@@ -82,6 +88,42 @@ DefaultSceneLayer::~DefaultSceneLayer() = default;
 void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 	_CreateScene();
 }
+
+
+double preFrame = glfwGetTime();
+void DefaultSceneLayer::OnUpdate()
+{
+
+	Application& app = Application::Get();
+	currScene = app.CurrentScene();
+
+	double currFrame = glfwGetTime();
+	float dt = static_cast<float>(currFrame - preFrame);
+
+	if (!start)
+	{
+		if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)
+		{
+			sPressed = true;
+			currScene->IsPlaying = true;
+
+		}
+
+		
+		if (sPressed)
+		{
+			start = true;
+			sPressed = false;
+			AudioEngine::playEvents("event:/Daytime Song");
+		}
+	}
+
+
+	
+}
+
+
+
 
 void DefaultSceneLayer::_CreateScene()
 {
@@ -139,12 +181,16 @@ void DefaultSceneLayer::_CreateScene()
 		MeshResource::Sptr monkeyMesh = ResourceManager::CreateAsset<MeshResource>("models/Monkey.obj");
 		MeshResource::Sptr shipMesh   = ResourceManager::CreateAsset<MeshResource>("models/fenrir.obj");
 
-		//Our 3d assets
+		//Our previous 3d assets
 		MeshResource::Sptr towerGardenMesh = ResourceManager::CreateAsset<MeshResource>("models/FinalArea.obj");
 		MeshResource::Sptr towerCannonMesh = ResourceManager::CreateAsset<MeshResource>("models/TowerV1.obj");
 		MeshResource::Sptr cannonBallMesh = ResourceManager::CreateAsset<MeshResource>("models/Cannonball.obj");
 		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinfullrig.obj");
 		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("models/CubeTester.fbx");
+
+		//Our new 3D Assets
+		MeshResource::Sptr winterGardenMesh = ResourceManager::CreateAsset<MeshResource>("models/WinterMap.obj");
+		MeshResource::Sptr newGoblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinsprint.obj");
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
@@ -154,9 +200,13 @@ void DefaultSceneLayer::_CreateScene()
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
 
-		//our texture assets
+		//our previous texture assets
 		Texture2D::Sptr    gardenTowerTexture = ResourceManager::CreateAsset<Texture2D>("textures/YYY5.png");
-		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
+		Texture2D::Sptr    redTex = ResourceManager::CreateAsset<Texture2D>("textures/red.png");
+		Texture2D::Sptr    goblinTex = ResourceManager::CreateAsset<Texture2D>("textures/GoblinUVFill.png");
+
+		//Our new texture assets
+		Texture2D::Sptr    winterGardenTexture = ResourceManager::CreateAsset<Texture2D>("textures/WinterGardenTexture.png");
 
 #pragma endregion
 
@@ -305,26 +355,42 @@ void DefaultSceneLayer::_CreateScene()
 			multiTextureMat->Set("u_Scale", 0.1f); 
 		}
 
-		//Our materials
+		//Our previous materials
 		Material::Sptr gardenTowerMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
-			gardenTowerMaterial->Name = "GardenTowerMat";
-			gardenTowerMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			gardenTowerMaterial->Set("u_Material.AlbedoMap", gardenTowerTexture);
 			gardenTowerMaterial->Set("u_Material.Shininess", 0.1f);
+			gardenTowerMaterial->Set("u_Material.NormalMap", normalMapDefault);
 		}
 
 		Material::Sptr cannonBallMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
-			cannonBallMaterial->Name = "CannonBallMat";
-			cannonBallMaterial->Set("u_Material.Diffuse", gardenTowerTexture);
+			cannonBallMaterial->Set("u_Material.AlbedoMap", boxTexture);
 			cannonBallMaterial->Set("u_Material.Shininess", 0.1f);
+			cannonBallMaterial->Set("u_Material.NormalMap", normalMapDefault);
 		}
 
 		Material::Sptr goblinMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
-			goblinMaterial->Name = "Goblin";
-			goblinMaterial->Set("u_Material.Diffuse", goblinTex);
+			goblinMaterial->Set("u_Material.AlbedoMap", goblinTex);
 			goblinMaterial->Set("u_Material.Shininess", 0.1f);
+			goblinMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr newGoblinMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			newGoblinMaterial->Set("u_Material.AlbedoMap", goblinTex);
+			newGoblinMaterial->Set("u_Material.Shininess", 0.1f);
+			newGoblinMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		//Our new materials
+		Material::Sptr winterGardenMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			winterGardenMaterial->Name = "Winter Garden Mat";
+			winterGardenMaterial->Set("u_Material.AlbedoMap", winterGardenTexture);
+			winterGardenMaterial->Set("u_Material.Shininess", 0.1f);
+			winterGardenMaterial->Set("u_Material.NormalMap", normalMapDefault);
 		}
 
 #pragma endregion
@@ -339,8 +405,8 @@ void DefaultSceneLayer::_CreateScene()
 
 		Light::Sptr lightComponent = mainLight->Add<Light>();
 		lightComponent->SetColor(glm::vec3(1.0f,1.0f,1.0f));
-		lightComponent->SetRadius(10.0f);
-		lightComponent->SetIntensity(25.0f);
+		lightComponent->SetRadius(50.0f); //25
+		lightComponent->SetIntensity(200.0f); //25
 
 		//Additional lights randomized. Default 50.
 		for (int ix = 0; ix < 0; ix++) {
@@ -357,10 +423,13 @@ void DefaultSceneLayer::_CreateScene()
 		// Set up the scene's camera
 		GameObject::Sptr camera = scene->MainCamera->GetGameObject()->SelfRef();
 		{
-			camera->SetPostion({ -9, -6, 15 });
-			camera->LookAt(glm::vec3(0.0f));
+			camera->SetPostion({ 2.75, 0, 5 }); //-9,-6,15 ; 2.75, 0, 5 
+			camera->SetRotation(glm::vec3(50.0f,0.f,-90.0f)); //90, 0,0 
+			//camera->LookAt(glm::vec3(0.0f));
 
+			//Need to create a camera controller for gameplay
 			camera->Add<SimpleCameraControl>();
+
 
 			// This is now handled by scene itself!
 			//Camera::Sptr cam = camera->Add<Camera>();
@@ -390,12 +459,16 @@ void DefaultSceneLayer::_CreateScene()
 		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
 		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
 		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
+		GameObject::Sptr cameraOffset = scene->CreateGameObject("Camera Offset");
 
+		cameraOffset->AddChild(camera);
 		gameObjectsParent->AddChild(enemiesParent);
 
 		// Set up all our sample objects
 		GameObject::Sptr plane = scene->CreateGameObject("Plane");
 		{
+			plane->SetPostion(glm::vec3(0.0f,0.0f,-4.0f));
+
 			// Make a big tiled mesh
 			MeshResource::Sptr tiledMesh = ResourceManager::CreateAsset<MeshResource>();
 			tiledMesh->AddParam(MeshBuilderParam::CreatePlane(ZERO, UNIT_Z, UNIT_X, glm::vec2(100.0f), glm::vec2(20.0f)));
@@ -413,10 +486,26 @@ void DefaultSceneLayer::_CreateScene()
 			defaultsParent->AddChild(plane);
 		}
 
+
+		GameObject::Sptr WinterGarden = scene->CreateGameObject("Winter Garden");
+		{
+			// Set position in the scene
+			WinterGarden->SetPostion(glm::vec3(0.0f, 0.0f, 0.0f));
+			WinterGarden->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			WinterGarden->SetScale(glm::vec3(0.100f,0.100f,0.100f));
+
+			RenderComponent::Sptr renderer = WinterGarden->Add<RenderComponent>();
+			renderer->SetMesh(winterGardenMesh);
+			renderer->SetMaterial(winterGardenMaterial);
+
+			mapParent->AddChild(WinterGarden);
+		}
+
+
 		GameObject::Sptr towerGarden = scene->CreateGameObject("towerGarden");
 		{
 			// Set position in the scene
-			towerGarden->SetPostion(glm::vec3(-118.0f, -154.0f, -4.0f));
+			towerGarden->SetPostion(glm::vec3(-130.69f, -143.80f, -400.0f)); //-130.69, -143.80, -4
 			towerGarden->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 
 			RenderComponent::Sptr renderer = towerGarden->Add<RenderComponent>();
@@ -454,7 +543,7 @@ void DefaultSceneLayer::_CreateScene()
 
 		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
 		{
-			towerCannon->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			towerCannon->SetPostion(glm::vec3(0.0f, 0.0f, 0.0f));
 			towerCannon->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 
 			// Add some behaviour that relies on the physics body
@@ -485,20 +574,19 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 
-
 		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
 		{
 			// Set position in the scene
 			goblin1->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
 			goblin1->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
-			goblin1->SetScale(glm::vec3(0.7f));
+			goblin1->SetScale(glm::vec3(2.0f));
 
 			// Add some behaviour that relies on the physics body
 			//towerGarden->Add<JumpBehaviour>();
 
 			// Create and attach a renderer for the monkey
 			RenderComponent::Sptr renderer = goblin1->Add<RenderComponent>();
-			renderer->SetMesh(goblinMesh);
+			renderer->SetMesh(newGoblinMesh);
 			renderer->SetMaterial(goblinMaterial);
 
 			//RigidBody::Sptr goblinRB = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
@@ -509,10 +597,12 @@ void DefaultSceneLayer::_CreateScene()
 			volume->AddCollider(col);
 
 			goblin1->Add<TriggerVolumeEnterBehaviour>();
+			goblin1->Add<EnemyMovement>();
+			
 
 			// Add a dynamic rigid body to this monkey
-			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
-			//physics->AddCollider(ConvexMeshCollider::Create());
+			RigidBody::Sptr physics = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+			physics->AddCollider(ConvexMeshCollider::Create());
 
 			enemiesParent->AddChild(goblin1);
 
@@ -523,6 +613,9 @@ void DefaultSceneLayer::_CreateScene()
 
 #pragma region UI creation
 
+
+
+/*
 		/////////////////////////// UI //////////////////////////////
 		GameObject::Sptr canvas = scene->CreateGameObject("Main Menu");
 		{
@@ -1016,6 +1109,9 @@ void DefaultSceneLayer::_CreateScene()
 			uiParent->AddChild(canvas6);
 		}
 
+
+
+		*/
 #pragma endregion
 
 #pragma region Commented Defaults
