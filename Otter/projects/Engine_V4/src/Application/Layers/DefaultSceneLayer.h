@@ -2,6 +2,7 @@
 #include "Application/ApplicationLayer.h"
 #include "json.hpp"
 #include "ToneFire.h"
+#include "Gameplay/Scene.h"
 
 
 /**
@@ -24,7 +25,10 @@ public:
 protected:
 	void _CreateScene();
 
-	bool playBackground = false;
+	bool sPressed = false;
+	bool isPaused = false;
+	bool start = false;
+
 	bool playGoblinSound = false;
 	bool playGrowlSound = false;
 

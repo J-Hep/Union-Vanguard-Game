@@ -50,6 +50,7 @@
 
 // Audio
 #include "Gameplay/Components/AudioEngine.h"
+#include "Gameplay/Components/common.h"
 
 // GUI
 #include "Gameplay/Components/GUI/RectTransform.h"
@@ -78,7 +79,7 @@ Application::Application() :
 	_windowSize({DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT}),
 	_isRunning(false),
 	_isEditor(true),
-	_windowTitle("INFR - 2350U"),
+	_windowTitle("Vanguard"),
 	_currentScene(nullptr),
 	_targetScene(nullptr)
 { }
