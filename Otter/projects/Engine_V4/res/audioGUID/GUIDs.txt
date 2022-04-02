@@ -1,0 +1,8 @@
+{d1e3ecee-7005-44a0-8c1a-03bc401d6281} bank:/MainStage
+{49fecc3a-017e-08e2-0a53-8942b1ee6419} bank:/MainStage.strings
+{ecf6e20a-dff2-4e06-966f-13868b6a81dc} bus:/
+{b3ae93e2-52a5-4dce-bbe3-e388dffbbff5} bus:/Reverb
+{68575e9c-c55b-4d6f-8212-395600801cbf} event:/Daytime Song
+{452a0afa-f7fd-45bd-bf00-4fc971349f62} event:/Goblin
+{3f311f90-04cf-463f-ad09-a799e34326c8} event:/Growls
+{2b2446a1-8497-4d20-837d-195457250286} parameter:/Parameter 1
