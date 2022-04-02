@@ -45,6 +45,7 @@
 #include "Gameplay/Components/Light.h"
 
 #include "Gameplay/Components/EnemyMovement.h"
+#include "Gameplay/Components/CameraVanguard.h"
 
 // GUI
 #include "Gameplay/Components/GUI/RectTransform.h"
@@ -276,6 +277,7 @@ void Application::_RegisterClasses()
 	ComponentManager::RegisterType<Light>();
 
 	ComponentManager::RegisterType<EnemyMovement>();
+	ComponentManager::RegisterType<CameraVanguard>();
 }
 
 void Application::_Load() {

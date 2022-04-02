@@ -1,16 +1,34 @@
-#include "Gameplay/Components/SimpleCameraControl.h"
-#include <GLFW/glfw3.h>
-#define  GLM_SWIZZLE
-#include <GLM/gtc/quaternion.hpp>
+#pragma once
+#include "IComponent.h"
 
-#include "Gameplay/GameObject.h"
-#include "Gameplay/Scene.h"
-#include "Utils/JsonGlmHelpers.h"
-#include "Utils/ImGuiHelper.h"
-#include "Gameplay/InputEngine.h"
-#include "Application/Application.h"
+struct GLFWwindow;
 
-class CameraVanguard
-{
+/// <summary>
+/// Camera rotates upon hiting A or D keys. Right now its janky 90 degree turns with no smoothing or key press delay. Press lightly.
+///
+/// </summary>
+class CameraVanguard : public Gameplay::IComponent {
+public:
+	typedef std::shared_ptr<CameraVanguard> Sptr;
+
+	CameraVanguard();
+	virtual ~CameraVanguard();
+
+	virtual void Update(float deltaTime) override;
+
+public:
+	virtual void RenderImGui() override;
+	MAKE_TYPENAME(CameraVanguard);
+	virtual nlohmann::json ToJson() const override;
+	static CameraVanguard::Sptr FromJson(const nlohmann::json& blob);
+
+protected:
+	//float _shiftMultipler;
+	//glm::vec2 _mouseSensitivity;
+	//glm::vec3 _moveSpeeds;
+	//glm::dvec2 _prevMousePos;
+	//glm::vec2 _currentRot;
+	glm::vec3 _cameraRotation;
+	//int _cameraIteration;
+	//bool _isMousePressed = false;
 };
-

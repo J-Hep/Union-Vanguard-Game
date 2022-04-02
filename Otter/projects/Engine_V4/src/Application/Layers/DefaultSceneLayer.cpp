@@ -50,6 +50,7 @@
 #include "Gameplay/Components/SimpleCameraControl.h"
 
 #include "Gameplay/Components/EnemyMovement.h"
+#include "Gameplay/Components/CameraVanguard.h"
 
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
@@ -148,9 +149,24 @@ void DefaultSceneLayer::_CreateScene()
 		MeshResource::Sptr goblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinfullrig.obj");
 		MeshResource::Sptr spearMesh = ResourceManager::CreateAsset<MeshResource>("models/CubeTester.fbx");
 
-		//Our new 3D Assets
+		//Our new static 3D Assets
 		MeshResource::Sptr winterGardenMesh = ResourceManager::CreateAsset<MeshResource>("models/WinterMap.obj");
 		MeshResource::Sptr newGoblinMesh = ResourceManager::CreateAsset<MeshResource>("models/goblinsprint.obj");
+
+		//Frame 1 of anims
+		MeshResource::Sptr birdFlyMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000001.obj");
+		MeshResource::Sptr goblinAttackMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000001.obj");
+		MeshResource::Sptr oozeMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000001.obj");
+		MeshResource::Sptr zombieAttackMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000001.obj");
+
+
+
+		//Cannon
+		MeshResource::Sptr cannonBarrelMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Cannon/CannonBarrel.obj");
+		MeshResource::Sptr cannonBaseMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Cannon/CannonBase.obj");
+
+
+
 
 		// Load in some textures
 		Texture2D::Sptr    boxTexture   = ResourceManager::CreateAsset<Texture2D>("textures/box-diffuse.png");
@@ -168,6 +184,16 @@ void DefaultSceneLayer::_CreateScene()
 		//Our new texture assets
 		Texture2D::Sptr    winterGardenTexture = ResourceManager::CreateAsset<Texture2D>("textures/WinterGardenTexture.png");
 
+		//frame 1 animated textures
+		Texture2D::Sptr    birdTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/BirdUV.png");
+		Texture2D::Sptr    goblinAttackTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/GoblinUvComp.png");
+		Texture2D::Sptr    oozeWalkTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		Texture2D::Sptr    zombieTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/ZombieUVblood.png");
+
+
+		//cannon
+		Texture2D::Sptr	   cannonBaseTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/CannonWood.png");
+		Texture2D::Sptr    cannonBarrelTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/Cannon.png");
 #pragma endregion
 
 #pragma region Basic Texture Creation
@@ -353,6 +379,58 @@ void DefaultSceneLayer::_CreateScene()
 			winterGardenMaterial->Set("u_Material.NormalMap", normalMapDefault);
 		}
 
+		//frame 1 material stuff
+		Material::Sptr birdFlyMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			birdFlyMaterial->Name = "birdFly Mat";
+			birdFlyMaterial->Set("u_Material.AlbedoMap", birdTexture);
+			birdFlyMaterial->Set("u_Material.Shininess", 0.1f);
+			birdFlyMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr goblinAttackMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			goblinAttackMaterial->Name = "goblinAttack Mat";
+			goblinAttackMaterial->Set("u_Material.AlbedoMap", goblinAttackTexture);
+			goblinAttackMaterial->Set("u_Material.Shininess", 0.1f);
+			goblinAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr oozeMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			oozeMaterial->Name = "ooze Mat";
+			oozeMaterial->Set("u_Material.AlbedoMap", oozeWalkTexture);
+			oozeMaterial->Set("u_Material.Shininess", 0.1f);
+			oozeMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr zombieAttackMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			zombieAttackMaterial->Name = "zombieAttack Mat";
+			zombieAttackMaterial->Set("u_Material.AlbedoMap", zombieTexture);
+			zombieAttackMaterial->Set("u_Material.Shininess", 0.1f);
+			zombieAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+
+		//Cannon stuff
+		Material::Sptr cannonBaseMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			cannonBaseMaterial->Name = "cannonBase mate";
+			cannonBaseMaterial->Set("u_Material.AlbedoMap", cannonBaseTexture);
+			cannonBaseMaterial->Set("u_Material.Shininess", 0.1f);
+			cannonBaseMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+		Material::Sptr cannonBarrelMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
+		{
+			cannonBarrelMaterial->Name = "cannon Barrel mat";
+			cannonBarrelMaterial->Set("u_Material.AlbedoMap", cannonBarrelTexture);
+			cannonBarrelMaterial->Set("u_Material.Shininess", 0.1f);
+			cannonBarrelMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+
 #pragma endregion
 
 #pragma region Lights Camera Action
@@ -388,7 +466,9 @@ void DefaultSceneLayer::_CreateScene()
 			//camera->LookAt(glm::vec3(0.0f));
 
 			//Need to create a camera controller for gameplay
-			camera->Add<SimpleCameraControl>();
+			//camera->Add<CameraVanguard>();
+			 
+			//camera->Add<SimpleCameraControl>();
 
 
 			// This is now handled by scene itself!
@@ -416,13 +496,20 @@ void DefaultSceneLayer::_CreateScene()
 		GameObject::Sptr mapParent = scene->CreateGameObject("Map"); {
 
 		}
+
+		GameObject::Sptr cameraOffset = scene->CreateGameObject("Camera Offset"); {
+			cameraOffset->Add<CameraVanguard>();
+		}
+
 		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
 		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
 		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
-		GameObject::Sptr cameraOffset = scene->CreateGameObject("Camera Offset");
+		GameObject::Sptr cannonParent = scene->CreateGameObject("CannonParts");
 
 		cameraOffset->AddChild(camera);
 		gameObjectsParent->AddChild(enemiesParent);
+		gameObjectsParent->AddChild(cannonParent);
+		
 
 		// Set up all our sample objects
 		GameObject::Sptr plane = scene->CreateGameObject("Plane");
@@ -501,6 +588,30 @@ void DefaultSceneLayer::_CreateScene()
 			gameObjectsParent->AddChild(cannonBall);
 		}
 
+		GameObject::Sptr cannonBarrel = scene->CreateGameObject("Cannon Barrel"); {
+			cannonBarrel->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			cannonBarrel->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			cannonBarrel->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = cannonBarrel->Add<RenderComponent>();
+			renderer->SetMesh(cannonBarrelMesh);
+			renderer->SetMaterial(cannonBarrelMaterial); //needs
+
+			cannonParent->AddChild(cannonBarrel);
+		};
+
+		GameObject::Sptr cannonBase = scene->CreateGameObject("Cannon Base"); {
+			cannonBase->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			cannonBase->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			cannonBase->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = cannonBase->Add<RenderComponent>();
+			renderer->SetMesh(cannonBaseMesh);
+			renderer->SetMaterial(cannonBaseMaterial); //needs
+
+			cannonParent->AddChild(cannonBase);
+		};
+
 		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
 		{
 			towerCannon->SetPostion(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -561,12 +672,61 @@ void DefaultSceneLayer::_CreateScene()
 			
 
 			// Add a dynamic rigid body to this monkey
-			//RigidBody::Sptr physics = full1->Add<RigidBody>(RigidBodyType::Dynamic);
-			//physics->AddCollider(ConvexMeshCollider::Create());
+			RigidBody::Sptr physics = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+			physics->AddCollider(ConvexMeshCollider::Create());
 
 			enemiesParent->AddChild(goblin1);
 
 		}
+
+		//Frame 1 stuff and more stuff
+		GameObject::Sptr birdFly = scene->CreateGameObject("birdFly"); {
+			birdFly->SetPostion(glm::vec3(10, 5.f, 5.0f));
+			birdFly->SetRotation(glm::vec3(90.0f, 145.0f, 96.0f));
+			birdFly->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = birdFly->Add<RenderComponent>();
+			renderer->SetMesh(birdFlyMesh);
+			renderer->SetMaterial(birdFlyMaterial); //needs
+
+			enemiesParent->AddChild(birdFly);
+		};
+
+		GameObject::Sptr goblinAttack = scene->CreateGameObject("goblinAttack"); {
+			goblinAttack->SetPostion(glm::vec3(7.62f,-2.97f, 1.0f));
+			goblinAttack->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+			goblinAttack->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = goblinAttack->Add<RenderComponent>();
+			renderer->SetMesh(goblinAttackMesh);
+			renderer->SetMaterial(goblinAttackMaterial); //needs
+
+			enemiesParent->AddChild(goblinAttack);
+		};
+
+		GameObject::Sptr oozeWalk = scene->CreateGameObject("oozeWalk"); {
+			oozeWalk->SetPostion(glm::vec3(5, 0.f, 2.0f));
+			oozeWalk->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			oozeWalk->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = oozeWalk->Add<RenderComponent>();
+			renderer->SetMesh(oozeMesh);
+			renderer->SetMaterial(oozeMaterial); //needs
+
+			enemiesParent->AddChild(oozeWalk);
+		};
+
+		GameObject::Sptr zombieAttack = scene->CreateGameObject("zombieAttack"); {
+			zombieAttack->SetPostion(glm::vec3(6.70, 2.970f, 2.0f));
+			zombieAttack->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+			zombieAttack->SetScale(glm::vec3(1.f));
+
+			RenderComponent::Sptr renderer = zombieAttack->Add<RenderComponent>();
+			renderer->SetMesh(zombieAttackMesh);
+			renderer->SetMaterial(zombieAttackMaterial); //needs
+
+			enemiesParent->AddChild(zombieAttack);
+		};
 		
 
 #pragma endregion

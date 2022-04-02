@@ -8,6 +8,7 @@ void EnemyMovement::Awake()
 {
 	_body = GetComponent<Gameplay::Physics::RigidBody>();
 	if (_body == nullptr) {
+		std::cout << "ENemy is not enabled\n";
 		IsEnabled = false;
 	}
 }
@@ -42,6 +43,11 @@ EnemyMovement::Sptr EnemyMovement::FromJson(const nlohmann::json& blob) {
 void EnemyMovement::Update(float deltaTime) {
 	//get position, move towards origin
 	glm::vec3 direction = -GetGameObject()->GetPosition();
+	//Enemy spawn locations
+	glm::vec3 pathPositions[] = {glm::vec3(40.f,0.f,0.f),glm::vec3(-40.f,0.f,0.f),glm::vec3(0.f,40.f,0.f),glm::vec3(0.f,-40.f,0.f)};
+
+
+
 	direction = glm::normalize(direction);
 	_body->SetLinearVelocity(direction);
 }
