@@ -47,6 +47,7 @@
 #include "Gameplay/Components/ParticleSystem.h"
 #include "Gameplay/Components/Light.h"
 #include "Gameplay/Components/EnemyMovement.h"
+#include "Gameplay/Components/CameraVanguard.h"
 
 // Audio
 #include "Gameplay/Components/AudioEngine.h"
@@ -292,6 +293,7 @@ void Application::_RegisterClasses()
 	ComponentManager::RegisterType<Light>();
 
 	ComponentManager::RegisterType<EnemyMovement>();
+	ComponentManager::RegisterType<CameraVanguard>();
 }
 
 void Application::_Load() {
