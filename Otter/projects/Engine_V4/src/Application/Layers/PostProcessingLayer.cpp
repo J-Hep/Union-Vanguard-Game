@@ -7,6 +7,7 @@
 #include "PostProcessing/BoxFilter3x3.h"
 #include "PostProcessing/BoxFilter5x5.h"
 #include "PostProcessing/OutlineEffect.h"
+#include "PostProcessing/PixelationEffect.h"
 
 PostProcessingLayer::PostProcessingLayer() :
 	ApplicationLayer()
@@ -16,7 +17,7 @@ PostProcessingLayer::PostProcessingLayer() :
 		AppLayerFunctions::OnAppLoad |
 		AppLayerFunctions::OnSceneLoad | AppLayerFunctions::OnSceneUnload | 
 		AppLayerFunctions::OnPostRender |
-		AppLayerFunctions::OnWindowResize;
+		AppLayerFunctions::OnWindowResize | AppLayerFunctions::OnUpdate;
 }
 
 PostProcessingLayer::~PostProcessingLayer() = default;
@@ -32,6 +33,7 @@ void PostProcessingLayer::OnAppLoad(const nlohmann::json& config)
 	_effects.push_back(std::make_shared<BoxFilter3x3>());
 	_effects.push_back(std::make_shared<BoxFilter5x5>());
 	_effects.push_back(std::make_shared<OutlineEffect>());
+	_effects.push_back(std::make_shared<PixelationEffect>());
 
 	Application& app = Application::Get();
 	const glm::uvec4& viewport = app.GetPrimaryViewport();
@@ -59,6 +61,12 @@ void PostProcessingLayer::OnAppLoad(const nlohmann::json& config)
 	_quadVAO->AddVertexBuffer(vbo, {
 		BufferAttribute(0, 2, AttributeType::Float, sizeof(glm::vec2), 0, AttribUsage::Position)
 	});
+
+	//Load in LUTS
+	coolLut = ResourceManager::CreateAsset<Texture3D>("luts/cool_lut.cube");
+	warmLut = ResourceManager::CreateAsset<Texture3D>("luts/warm_lut.cube");
+	customLut = ResourceManager::CreateAsset<Texture3D>("luts/custom_lut.cube");
+
 }
 
 void PostProcessingLayer::OnPostRender()
@@ -94,7 +102,7 @@ void PostProcessingLayer::OnPostRender()
 			current->BindAttachment(RenderTargetAttachment::Color0, 0);
 
 			// Apply the effect and render the fullscreen quad
-			effect->Apply(gBuffer);
+			effect->Apply(gBuffer, _quadVAO);
 			_quadVAO->Draw();
 
 			// Unbind output and set it as input for next pass
@@ -152,4 +160,43 @@ const std::vector<PostProcessingLayer::Effect::Sptr>& PostProcessingLayer::GetEf
 void PostProcessingLayer::Effect::DrawFullscreen()
 {
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void PostProcessingLayer::OnUpdate()
+{
+	if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed)//cool
+	{
+		lut1 = !lut1;
+	}
+	if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed)//warm
+	{
+		lut2 = !lut2;
+	}
+	if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed)//custom
+	{
+		lut3 = !lut3;
+	}
+
+	if (lut1)
+	{
+		_effects[0]->ChangeLut(coolLut);
+	}
+	if (lut2)
+	{
+		_effects[0]->ChangeLut(warmLut);
+	}
+	if (lut3)
+	{
+		_effects[0]->ChangeLut(customLut);
+	}
+	if (!lut1 && !lut2 && !lut3) //none enabled
+	{
+		_effects[0]->Enabled = false; //turn off color correction
+	}
+	else //one of them is on
+	{
+		_effects[0]->Enabled = true;
+	}
+
+
 }

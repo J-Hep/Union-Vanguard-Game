@@ -3,7 +3,7 @@
 #include "json.hpp"
 #include "ToneFire.h"
 #include "Gameplay/Scene.h"
-#include "Gameplay/MeshResource.h"
+
 
 /**
  * This example layer handles creating a default test scene, which we will use 
