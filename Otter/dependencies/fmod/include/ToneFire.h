@@ -93,7 +93,7 @@ namespace ToneFire {
 		friend DLL CoreSound;
 	public:
 		FMODCore(int maxChannels = 512,
-			const std::string& defaultPath = "./Assets/Sounds/",
+			const std::string& defaultPath = "./",
 			const Listener& listener = Listener());
 		~FMODCore();
 
@@ -177,13 +177,12 @@ namespace ToneFire {
 		friend StudioSound;
 	public:
 		FMODStudio(int maxChannels = 512,
-			const std::string& defaultPath = "./Assets/Sounds/",
+			const std::string& defaultPath = "./audio/",
 			const Listener& listener = Listener());
 		~FMODStudio();
 
 		void Update();
-		void LoadBank(const std::string& bankName,
-			FMOD_STUDIO_LOAD_BANK_FLAGS flags = FMOD_STUDIO_LOAD_BANK_NORMAL);
+		void LoadBank(const std::string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags = FMOD_STUDIO_LOAD_BANK_NORMAL);
 	private:
 
 		FMOD::Studio::EventDescription* _GetEventDescription(const std::string& eventName);

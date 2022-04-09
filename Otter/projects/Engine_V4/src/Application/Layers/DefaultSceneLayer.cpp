@@ -54,6 +54,7 @@
 #include "Gameplay/Components/SimpleCameraControl.h"
 #include "Gameplay/Components/EnemyMovement.h"
 #include "Gameplay/Components/CameraVanguard.h"
+#include "Gameplay/Components/AudioEngine.h"
 
 // Physics
 #include "Gameplay/Physics/RigidBody.h"
