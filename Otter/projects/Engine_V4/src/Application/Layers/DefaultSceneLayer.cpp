@@ -77,6 +77,8 @@
 #include "Graphics/Textures/Texture3D.h"
 #include "Graphics/Textures/Texture1D.h"
 
+#include <stdlib.h>
+
 DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
 {
@@ -92,6 +94,15 @@ void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 
 
 double preFrame = glfwGetTime();
+bool uiStart = true;
+bool isButtonPressed = false;
+int menuSelect = 1, menuType = 1;
+	//menuType 1 = main menu
+	//menuType 2 = settings
+	//menuType 3 = in game
+	//menuType 4 = pause menu
+	//menuType 5 = win screen
+	//menuType 6 = lose screen
 void DefaultSceneLayer::OnUpdate()
 {
 
@@ -101,26 +112,284 @@ void DefaultSceneLayer::OnUpdate()
 	double currFrame = glfwGetTime();
 	float dt = static_cast<float>(currFrame - preFrame);
 
-	if (!start)
+	Gameplay::GameObject::Sptr mainMenu = currScene->FindObjectByName("Main Menu");
+	Gameplay::GameObject::Sptr mainMenuB1 = currScene->FindObjectByName("Button1");
+	Gameplay::GameObject::Sptr mainMenuB2 = currScene->FindObjectByName("Button2");
+	Gameplay::GameObject::Sptr mainMenuB3 = currScene->FindObjectByName("Button3");
+
+	Gameplay::GameObject::Sptr settingsMenu = currScene->FindObjectByName("Settings Menu");
+	Gameplay::GameObject::Sptr settingsMenuB1 = currScene->FindObjectByName("Button4");
+	Gameplay::GameObject::Sptr settingsMenuB2 = currScene->FindObjectByName("Button5");
+	Gameplay::GameObject::Sptr settingsMenuB3 = currScene->FindObjectByName("Button6");
+
+	Gameplay::GameObject::Sptr inGame = currScene->FindObjectByName("inGameGUI");
+	Gameplay::GameObject::Sptr inGameScore = currScene->FindObjectByName("Score");
+	Gameplay::GameObject::Sptr inGamePower = currScene->FindObjectByName("Charge Level");
+	Gameplay::GameObject::Sptr inGameHealth = currScene->FindObjectByName("Health Level");
+
+	Gameplay::GameObject::Sptr pauseMenu = currScene->FindObjectByName("Pause Menu");
+	Gameplay::GameObject::Sptr pauseMenuB1 = currScene->FindObjectByName("Button7");
+	Gameplay::GameObject::Sptr pauseMenuB2 = currScene->FindObjectByName("Button8");
+
+	Gameplay::GameObject::Sptr winMenu = currScene->FindObjectByName("Win");
+	Gameplay::GameObject::Sptr winMenuScore = currScene->FindObjectByName("FinalScoreW");
+	Gameplay::GameObject::Sptr winMenuB1 = currScene->FindObjectByName("Button9");
+
+	Gameplay::GameObject::Sptr loseMenu = currScene->FindObjectByName("Lose");
+	Gameplay::GameObject::Sptr loseMenuScore = currScene->FindObjectByName("FinalScoreL");
+	Gameplay::GameObject::Sptr loseMenuB1 = currScene->FindObjectByName("Button10");
+
+	if (uiStart == true)
 	{
-		if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)
+		settingsMenu->SetEnabled(false);
+		inGame->SetEnabled(false);
+		pauseMenu->SetEnabled(false);
+		winMenu->SetEnabled(false);
+		loseMenu->SetEnabled(false);
+		uiStart = false;
+	}
+	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
+	{
+		if (!isButtonPressed)
 		{
-			sPressed = true;
-			currScene->IsPlaying = true;
-
-		}
-
-		
-		if (sPressed)
-		{
-			start = true;
-			sPressed = false;
-			AudioEngine::playEvents("event:/Daytime Song");
+			if (currScene->IsPlaying == true)
+			{
+				pauseMenu->SetEnabled(true);
+				inGame->SetEnabled(false);
+				currScene->IsPlaying = false;
+				menuType = 4;
+			}
+			//possible pause sound effect could go here                                       <------------------ GABE LOOK HERE!!!!
+			isButtonPressed = true;
 		}
 	}
+	else
+	{
+		isButtonPressed = false;
+	}
+	if (menuType == 1)
+	{
+		//main menu button selection 
+		if (menuSelect == 1)
+		{
+			mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+			//mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(1.0f));
+		}
+		if (menuSelect == 2)
+		{
+			mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+		if (menuSelect == 3)
+		{
+			mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+	}
+	//settings selection color
+	else if (menuType == 2)
+	{
+		//main menu button selection 
+		if (menuSelect == 1)
+		{
+			settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+		if (menuSelect == 2)
+		{
+			settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+		if (menuSelect == 3)
+		{
+			settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+	}
+	//pause selection color
+	else if (menuType == 4)
+	{
+		if (menuSelect == 1)
+		{
+			pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+		if (menuSelect == 2)
+		{
+			pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		else
+		{
+			pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+		}
+	}
+	//win screen selection color
+	else if (menuType == 5)
+	{
+		winMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	}
+	//lose screen selection color
+	else if (menuType == 6)
+	{
+		loseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	}
 
-
-	
+	if (InputEngine::GetKeyState(GLFW_KEY_UP) == ButtonState::Pressed) //select up
+	{
+		if (!isButtonPressed)
+		{
+			if (menuType == 4)
+			{
+				if (menuSelect == 1)
+				{
+					menuSelect = 2;
+				}
+				else
+				{
+					menuSelect = 1;
+				}
+			}
+			else
+			{
+				if (menuSelect == 1)
+				{
+					menuSelect = 3;
+				}
+				else
+				{
+					menuSelect--;
+				}
+			}
+			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+		}
+		isButtonPressed = true;
+	}
+	else if (InputEngine::GetKeyState(GLFW_KEY_DOWN) == ButtonState::Pressed) //select down
+	{
+		if (!isButtonPressed)
+		{
+			if (menuType == 4)
+			{
+				if (menuSelect == 2)
+				{
+					menuSelect = 1;
+				}
+				else
+				{
+					menuSelect = 2;
+				}
+			}
+			else
+			{
+				if (menuSelect == 3)
+				{
+					menuSelect = 1;
+				}
+				else
+				{
+					menuSelect++;
+				}
+			}
+			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+		}
+		isButtonPressed = true;
+	}
+	else if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)  //button selection
+	{
+		if (!isButtonPressed)
+		{
+			//button click sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			//main menu
+			if (menuType == 1)
+			{
+				if (menuSelect == 1)
+				{
+					mainMenu->SetEnabled(false);
+					inGame->SetEnabled(true);
+					inGame->RenderGUI();
+					menuType = 3;
+					currScene->IsPlaying = true;
+					AudioEngine::playEvents("event:/Daytime Song");
+				}
+				if (menuSelect == 2)
+				{
+					mainMenu->SetEnabled(false);
+					settingsMenu->SetEnabled(true);
+					settingsMenu->RenderGUI();
+					menuType = 2;
+				}
+				if (menuSelect == 3)
+				{
+					exit(0);
+				}
+			}
+			//settings
+			else if (menuType == 2)
+			{
+				if (menuSelect == 3)
+				{
+					settingsMenu->SetEnabled(false);
+					mainMenu->SetEnabled(true);
+					mainMenu->RenderGUI();
+					menuType = 1;
+				}
+			}
+			//pause menu
+			else if (menuType == 4)
+			{
+				if (menuSelect == 1)
+				{
+					exit(0);
+				}
+				else if (menuSelect == 2)
+				{
+					pauseMenu->SetEnabled(false);
+					inGame->SetEnabled(true);
+					inGame->RenderGUI();
+					menuType = 3;
+					currScene->IsPlaying = true;
+				}
+			}
+			//win screen
+			else if (menuType == 5)
+			{
+				exit(0);
+			}
+			//lose screen
+			else if (menuType == 6)
+			{
+				exit(0);
+			}
+		}
+		isButtonPressed = true;
+	}
+	else
+	{
+		isButtonPressed = false;
+	}
+		
 }
 
 
@@ -781,9 +1050,39 @@ void DefaultSceneLayer::_CreateScene()
 #pragma region UI creation
 
 		//pain
-
 /*
-		/////////////////////////// UI //////////////////////////////
+		GameObject::Sptr canvas = scene->CreateGameObject("UI Canvas");
+		{
+			RectTransform::Sptr transform = canvas->Add<RectTransform>();
+			transform->SetMin({ 16, 16 });
+			transform->SetMax({ 128, 128 });
+			transform->SetPosition(glm::vec2(100.0f, 177.0f));
+			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
+
+
+			GameObject::Sptr subPanel = scene->CreateGameObject("Sub Item");
+			{
+				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 64, 64 });
+
+				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/upArrow.png"));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel->Add<GuiText>();
+				text->SetText("Hello world!");
+				text->SetFont(font);
+
+			}
+
+			canvas->AddChild(subPanel);
+		}*/
+		///////////////////////////// UI //////////////////////////////
 		GameObject::Sptr canvas = scene->CreateGameObject("Main Menu");
 		{
 			RectTransform::Sptr transform = canvas->Add<RectTransform>();
@@ -875,7 +1174,7 @@ void DefaultSceneLayer::_CreateScene()
 			}
 			canvas->AddChild(subPanel4);
 
-			uiParent->AddChild(canvas);
+			//uiParent->AddChild(canvas);
 		}
 
 		GameObject::Sptr canvas2 = scene->CreateGameObject("Settings Menu");
@@ -967,17 +1266,18 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas2->AddChild(subPanel4);
-			uiParent->AddChild(canvas2);
+			//uiParent->AddChild(canvas2);
 		}
 
 		GameObject::Sptr canvas3 = scene->CreateGameObject("inGameGUI");
 		{
+			RectTransform::Sptr transform = canvas3->Add<RectTransform>();
 			GameObject::Sptr subPanel1 = scene->CreateGameObject("Score");
 			{
 				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
 				transform->SetMin({ 6, 10 });
 				transform->SetMax({ 110, 50 });
-				transform->SetPosition(glm::vec2(70.0f, 775.0f));
+				transform->SetPosition(glm::vec2(200.0f, 800.0f));
 
 				GuiPanel::Sptr canPanel = subPanel1->Add<GuiPanel>();
 				canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1020,7 +1320,7 @@ void DefaultSceneLayer::_CreateScene()
 
 				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
 			}
 			canvas3->AddChild(subPanel3);
 
@@ -1053,11 +1353,11 @@ void DefaultSceneLayer::_CreateScene()
 
 				GuiPanel::Sptr panel = subPanel5->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
 
 			}
 			canvas3->AddChild(subPanel5);
-			uiParent->AddChild(canvas3);
+			//uiParent->AddChild(canvas3);
 		}
 
 		GameObject::Sptr canvas4 = scene->CreateGameObject("Pause Menu");
@@ -1129,7 +1429,7 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas4->AddChild(subPanel4);
-			uiParent->AddChild(canvas4);
+			//uiParent->AddChild(canvas4);
 		}
 
 		GameObject::Sptr canvas5 = scene->CreateGameObject("Win");
@@ -1201,7 +1501,7 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas5->AddChild(subPanel4);
-			uiParent->AddChild(canvas5);
+			//uiParent->AddChild(canvas5);
 		}
 
 		GameObject::Sptr canvas6 = scene->CreateGameObject("Lose");
@@ -1273,12 +1573,12 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas6->AddChild(subPanel4);
-			uiParent->AddChild(canvas6);
+			//uiParent->AddChild(canvas6);
 		}
 
 
 
-		*/
+		
 #pragma endregion
 
 #pragma region Commented Defaults
