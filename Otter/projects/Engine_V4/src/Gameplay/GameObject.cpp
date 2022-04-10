@@ -12,6 +12,8 @@
 #include "Utils/ImGuiHelper.h"
 
 #include "Gameplay/Scene.h"
+#include "Components/GUI/RectTransform.h"
+#include "Graphics/GuiBatcher.h"
 
 namespace Gameplay {
 	GameObject::GameObject() :
@@ -75,9 +77,9 @@ namespace Gameplay {
 	}
 
 	void GameObject::_PurgeDeletedChildren() {
-		auto it = std::remove_if(_children.begin(), _children.end(), [](WeakRef child) { 
-			return child == nullptr; 
-		});
+		auto it = std::remove_if(_children.begin(), _children.end(), [](WeakRef child) {
+			return child == nullptr;
+			});
 		_children.erase(it, _children.end());
 	}
 
@@ -179,23 +181,31 @@ namespace Gameplay {
 			_children.erase(it);
 		}
 
-		for (auto& component : _components) {
-			if (component->IsEnabled) {
-				component->StartGUI();
+		RectTransform::Sptr rect = Get<RectTransform>();
+
+		if (rect != nullptr) {
+			GuiBatcher::PushModelTransform(rect->GetLocalTransform());
+
+			for (auto& component : _components) {
+				if (component->IsEnabled) {
+					component->StartGUI();
+				}
 			}
-		}
-		for (auto& component : _components) {
-			if (component->IsEnabled) {
-				component->RenderGUI();
+			for (auto& component : _components) {
+				if (component->IsEnabled) {
+					component->RenderGUI();
+				}
 			}
-		}
-		for (auto& child : _children) {
-			child->RenderGUI();
-		}
-		for (auto& component : _components) {
-			if (component->IsEnabled) {
-				component->FinishGUI();
+			for (auto& child : _children) {
+				child->RenderGUI();
 			}
+			for (auto& component : _components) {
+				if (component->IsEnabled) {
+					component->FinishGUI();
+				}
+			}
+
+			GuiBatcher::PopModelTransform();
 		}
 	}
 
@@ -271,7 +281,7 @@ namespace Gameplay {
 		}
 
 		// Make sure the object isn't already a child of this object
-		auto it = std::find_if(_children.begin(), _children.end(), [child](GameObject::WeakRef wPtr) { return wPtr == child;});
+		auto it = std::find_if(_children.begin(), _children.end(), [child](GameObject::WeakRef wPtr) { return wPtr == child; });
 
 		// As long as the child is not already a child of this gameobject, add it
 		if (it == _children.end()) {
@@ -280,7 +290,8 @@ namespace Gameplay {
 			_children.push_back(child);
 			child->_parent = _selfRef.lock();
 			child->_isWorldTransformDirty = true;
-		} else {
+		}
+		else {
 			LOG_WARN("Attempting to add same child twice, ignoring: {}", child->Name);
 		}
 	}
@@ -288,13 +299,14 @@ namespace Gameplay {
 	bool GameObject::RemoveChild(const GameObject::Sptr& child) {
 		// Find the child in our list of children if it exists
 		auto it = std::find_if(_children.begin(), _children.end(), [child](GameObject::WeakRef wPtr) { return wPtr == child; });
-		
-		if (it != _children.end()) { 
+
+		if (it != _children.end()) {
 			// Clear the object's parent and remove from our list of children
 			child->_parent.Reset();
 			_children.erase(it);
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
@@ -355,7 +367,7 @@ namespace Gameplay {
 
 			// Render position label
 			_isLocalTransformDirty |= LABEL_LEFT(ImGui::DragFloat3, "Position", &_position.x, 0.01f);
-			
+
 			// Get the ImGui storage state so we can avoid gimbal locking issues by storing euler angles in the editor
 			glm::vec3 euler = GetRotationEuler();
 			ImGuiStorage* guiStore = ImGui::GetStateStorage();
@@ -378,7 +390,7 @@ namespace Gameplay {
 				//Send new rotation to the gameobject
 				SetRotation(euler);
 			}
-			
+
 			// Draw the scale
 			_isLocalTransformDirty |= LABEL_LEFT(ImGui::DragFloat3, "Scale   ", &_scale.x, 0.01f, 0.0f);
 
@@ -390,7 +402,7 @@ namespace Gameplay {
 			for (int ix = 0; ix < _components.size(); ix++) {
 				std::shared_ptr<IComponent> component = _components[ix];
 				if (ImGui::CollapsingHeader(component->ComponentTypeName().c_str())) {
-					ImGui::PushID(component.get()); 
+					ImGui::PushID(component.get());
 					component->RenderImGui();
 					// Render a delete button for the component
 					if (ImGuiHelper::WarningButton("Delete")) {
@@ -415,7 +427,7 @@ namespace Gameplay {
 							selectedType = type;
 						}
 					}
-				});
+					});
 				ImGui::EndCombo();
 			}
 			ImGui::SameLine();
@@ -461,7 +473,7 @@ namespace Gameplay {
 		result->_parent = WeakRef(Guid(data.contains("parent") ? data["parent"] : "null"), nullptr);
 		result->_position = (data["position"]);
 		result->_rotation = (data["rotation"]);
-		result->_scale    = (data["scale"]);
+		result->_scale = (data["scale"]);
 		result->HideInHierarchy = JsonGet(data, "hide_in_inspector", false);
 		result->_isLocalTransformDirty = true;
 		result->_isWorldTransformDirty = true;

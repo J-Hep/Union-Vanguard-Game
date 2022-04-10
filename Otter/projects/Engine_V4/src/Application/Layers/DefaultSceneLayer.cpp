@@ -109,13 +109,38 @@ void DefaultSceneLayer::OnUpdate()
 			currScene->IsPlaying = true;
 
 		}
-
-		
+				
 		if (sPressed)
 		{
 			start = true;
 			sPressed = false;
 			AudioEngine::playEvents("event:/Daytime Song");
+		}
+
+		if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
+			//shoot then reset wait timer
+			if (shootPower < 70)
+			{
+				shootPower += dt * 20.0f;
+			}
+			else
+			{
+				shootPower = 70.0f;
+			}
+			charging = true;
+			powerLevel = (shootPower / 70);
+		}
+		else
+		{
+			if (charging == true)
+			{
+				//spawn cannonball in the lane we're looking at
+
+				canShoot = false;
+				shootTimer = shootTime;
+				shootPower = 5.0f;
+				charging = false;
+			}
 		}
 	}
 
@@ -715,6 +740,8 @@ void DefaultSceneLayer::_CreateScene()
 
 			goblin1->Add<TriggerVolumeEnterBehaviour>();
 			goblin1->Add<EnemyMovement>();
+
+			goblin1->Get<EnemyMovement>()->setGameObject(goblin1);
 			
 
 			// Add a dynamic rigid body to this monkey
