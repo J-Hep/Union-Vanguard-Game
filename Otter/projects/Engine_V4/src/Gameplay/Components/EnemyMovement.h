@@ -1,6 +1,7 @@
 #pragma once
 #include "IComponent.h"
 #include "Gameplay/Physics/RigidBody.h"
+#include "Gameplay/GameObject.h"
 
 /// <summary>
 /// The movement script for all enemies, different damage and 
@@ -19,6 +20,8 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void OnEnteredTrigger(const std::shared_ptr<Gameplay::Physics::TriggerVolume>& trigger) override;
 
+	void setGameObject(Gameplay::GameObject::Sptr object);
+
 public:
 	virtual void RenderImGui() override;
 	MAKE_TYPENAME(EnemyMovement);
@@ -30,5 +33,6 @@ protected:
 	float _damage;
 
 	Gameplay::Physics::RigidBody::Sptr _body;
+	Gameplay::GameObject::Sptr _gameObject;
 };
 

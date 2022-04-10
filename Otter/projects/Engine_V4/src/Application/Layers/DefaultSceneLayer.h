@@ -25,6 +25,14 @@ public:
 protected:
 	void _CreateScene();
 
+	//shooting variables
+	bool canShoot = false;
+	bool charging = false;
+	float shootPower = 0.f;
+	float powerLevel = 0.f;
+	float shootTimer = 0.f;
+	float shootTime = 1.75f;
+
 	bool sPressed = false;
 	bool isPaused = false;
 	bool start = false;

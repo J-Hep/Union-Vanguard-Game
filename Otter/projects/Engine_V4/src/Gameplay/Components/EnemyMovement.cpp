@@ -53,7 +53,11 @@ void EnemyMovement::Update(float deltaTime) {
 }
 
 void EnemyMovement::OnEnteredTrigger(const std::shared_ptr<Gameplay::Physics::TriggerVolume>& trigger) {
-	//increase score
-	//destroy object
-	_body->IsEnabled = false;
+	//increase score here
+	
+	_body->GetGameObject()->GetScene()->RemoveGameObject(_gameObject);
+}
+
+void EnemyMovement::setGameObject(Gameplay::GameObject::Sptr object) {
+	_gameObject = object;
 }
