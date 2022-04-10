@@ -164,39 +164,39 @@ void PostProcessingLayer::Effect::DrawFullscreen()
 
 void PostProcessingLayer::OnUpdate()
 {
-	if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed)//cool
-	{
-		lut1 = !lut1;
-	}
-	if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed)//warm
-	{
-		lut2 = !lut2;
-	}
-	if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed)//custom
-	{
-		lut3 = !lut3;
-	}
+	//if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed)//cool
+	//{
+	//	lut1 = !lut1;
+	//}
+	//if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed)//warm
+	//{
+	//	lut2 = !lut2;
+	//}
+	//if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed)//custom
+	//{
+	//	lut3 = !lut3;
+	//}
 
-	if (lut1)
-	{
-		_effects[0]->ChangeLut(coolLut);
-	}
-	if (lut2)
-	{
-		_effects[0]->ChangeLut(warmLut);
-	}
-	if (lut3)
-	{
-		_effects[0]->ChangeLut(customLut);
-	}
-	if (!lut1 && !lut2 && !lut3) //none enabled
-	{
-		_effects[0]->Enabled = false; //turn off color correction
-	}
-	else //one of them is on
-	{
-		_effects[0]->Enabled = true;
-	}
+	//if (lut1)
+	//{
+	//	_effects[0]->ChangeLut(coolLut);
+	//}
+	//if (lut2)
+	//{
+	//	_effects[0]->ChangeLut(warmLut);
+	//}
+	//if (lut3)
+	//{
+	//	_effects[0]->ChangeLut(customLut);
+	//}
+	//if (!lut1 && !lut2 && !lut3) //none enabled
+	//{
+	//	_effects[0]->Enabled = false; //turn off color correction
+	//}
+	//else //one of them is on
+	//{
+	//	_effects[0]->Enabled = true;
+	//}
 
 
 }

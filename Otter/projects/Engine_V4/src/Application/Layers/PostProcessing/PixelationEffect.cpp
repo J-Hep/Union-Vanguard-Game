@@ -23,7 +23,7 @@ PixelationEffect::PixelationEffect() :
 
 PixelationEffect::~PixelationEffect() = default;
 
-void PixelationEffect::Apply(const Framebuffer::Sptr & gBuffer)
+void PixelationEffect::Apply(const Framebuffer::Sptr & gBuffer, VertexArrayObject::Sptr _quadVAO)
 {
 	_shader->Bind();
 	_shader->SetUniform("u_Filter", Filter, 25);

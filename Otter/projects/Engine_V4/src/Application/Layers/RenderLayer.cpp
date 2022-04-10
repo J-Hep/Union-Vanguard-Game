@@ -98,6 +98,7 @@ void RenderLayer::OnRender(const Framebuffer::Sptr & prevLayer)
 
 	// Make sure depth testing and culling are re-enabled
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 	//glEnable(GL_CULL_FACE);
 	glDepthMask(true);
 
@@ -108,7 +109,7 @@ void RenderLayer::OnRender(const Framebuffer::Sptr & prevLayer)
 	Camera::Sptr camera = app.CurrentScene()->MainCamera;
 
 	// We can now render all our scene elements via the helper function
-	_RenderScene(camera->GetView(), camera->GetProjection());
+	_RenderScene(camera->GetView(), camera->GetProjection(), _primaryFBO->GetSize());
 
 	// Use our cubemap to draw our skybox
 	app.CurrentScene()->DrawSkybox();
@@ -262,8 +263,8 @@ void RenderLayer::_AccumulateLighting()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, shadowCam->GetBufferResolution().x, shadowCam->GetBufferResolution().y);
 
-		_RenderScene(shadowCam->GetGameObject()->GetInverseTransform(), shadowCam->GetProjection());
-
+		_RenderScene(shadowCam->GetGameObject()->GetInverseTransform(), shadowCam->GetProjection(), shadowCam->GetDepthBuffer()->GetSize());
+		
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		});
 
@@ -571,10 +572,6 @@ void RenderLayer::OnAppLoad(const nlohmann::json & config)
 	_lightAccumulationShader->LoadShaderPartFromFile("shaders/fragment_shaders/light_accumulation.glsl", ShaderPartType::Fragment);
 	_lightAccumulationShader->Link();
 
-	//_SlimeShader = ShaderProgram::Create();
-	//_SlimeShader->LoadShaderPartFromFile("shaders/vertex_shaders/fullscreen_quad.glsl", ShaderPartType::Vertex);
-	//_SlimeShader->LoadShaderPartFromFile("shaders/fragment_shaders/Test.glsl", ShaderPartType::Fragment);
-	//_SlimeShader->Link();
 
 	//set warps here!!!
 	diffusewarp = ResourceManager::CreateAsset<Texture1D>("luts/difftoon.png");
@@ -689,7 +686,7 @@ void RenderLayer::_InitFrameUniforms()
 	_frameUniforms->Update();
 }
 
-void RenderLayer::_RenderScene(const glm::mat4& view, const glm::mat4& projection)
+void RenderLayer::_RenderScene(const glm::mat4& view, const glm::mat4& projection, const glm::ivec2& screenSize)
 {
 	using namespace Gameplay;
 
@@ -753,4 +750,9 @@ void RenderLayer::_RenderScene(const glm::mat4& view, const glm::mat4& projectio
 		renderable->GetMesh()->Draw();
 
 		});
+}
+
+const UniformBuffer<RenderLayer::FrameLevelUniforms>::Sptr& RenderLayer::GetFrameUniforms() const
+{
+	return _frameUniforms;
 }

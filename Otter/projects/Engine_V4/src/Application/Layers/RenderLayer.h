@@ -108,6 +108,8 @@ public:
 	const Framebuffer::Sptr& GetRenderOutput() const;
 	const Framebuffer::Sptr& GetGBuffer() const;
 
+	const UniformBuffer<FrameLevelUniforms>::Sptr& GetFrameUniforms() const;
+
 	// Inherited from ApplicationLayer
 	virtual void OnUpdate() override;
 
@@ -154,7 +156,7 @@ protected:
 	UniformBuffer<LightingUboStruct>::Sptr _lightingUbo;
 
 	void _InitFrameUniforms();
-	void _RenderScene(const glm::mat4& view, const glm::mat4& projection);
+	void _RenderScene(const glm::mat4& view, const glm::mat4& projection, const glm::ivec2& screenSize);
 
 	void _AccumulateLighting();
 	void _Composite();
