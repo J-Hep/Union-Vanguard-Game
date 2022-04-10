@@ -151,7 +151,6 @@ void DefaultSceneLayer::OnUpdate()
 	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
 	{
 		if (!isButtonPressed)
-		if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)
 		{
 			if (currScene->IsPlaying == true)
 			{
@@ -195,33 +194,7 @@ void DefaultSceneLayer::OnUpdate()
 		else
 		{
 			mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-
-		if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
-			//shoot then reset wait timer
-			if (shootPower < 70)
-			{
-				shootPower += dt * 20.0f;
-			}
-			else
-			{
-				shootPower = 70.0f;
-			}
-			charging = true;
-			powerLevel = (shootPower / 70);
-		}
-		else
-		{
-			if (charging == true)
-			{
-				//spawn cannonball in the lane we're looking at
-
-				canShoot = false;
-				shootTimer = shootTime;
-				shootPower = 5.0f;
-				charging = false;
-			}
-		}
+		}		
 	}
 	//settings selection color
 	else if (menuType == 2)
@@ -416,7 +389,32 @@ void DefaultSceneLayer::OnUpdate()
 	{
 		isButtonPressed = false;
 	}
-		
+	
+	if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
+		//shoot then reset wait timer
+		if (shootPower < 70)
+		{
+			shootPower += dt * 20.0f;
+		}
+		else
+		{
+			shootPower = 70.0f;
+		}
+		charging = true;
+		powerLevel = (shootPower / 70);
+	}
+	else
+	{
+		if (charging == true)
+		{
+			//spawn cannonball in the lane we're looking at
+
+			canShoot = false;
+			shootTimer = shootTime;
+			shootPower = 5.0f;
+			charging = false;
+		}
+	}
 }
 
 
