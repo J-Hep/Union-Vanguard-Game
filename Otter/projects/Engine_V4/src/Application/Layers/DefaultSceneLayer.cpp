@@ -78,6 +78,9 @@
 #include "Graphics/Textures/Texture1D.h"
 
 #include <stdlib.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
@@ -92,22 +95,41 @@ void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 	_CreateScene();
 }
 
+void DefaultSceneLayer::BubbleSort(std::vector<int>& arr)
+{
+	bool swap = true;
+	while (swap) {
+		swap = false;
+		for (size_t i = 0; i < arr.size() - 1; i++) {
+			if (arr[i] > arr[i + 1]) {
+				arr[i] += arr[i + 1];
+				arr[i + 1] = arr[i] - arr[i + 1];
+				arr[i] -= arr[i + 1];
+				swap = true;
+			}
+		}
+	}
+}
 
 double preFrame = glfwGetTime();
 bool uiStart = true;
 bool isButtonPressed = false;
 int menuSelect = 1, menuType = 1;
+std::vector<int> scores;
+std::string score;
 	//menuType 1 = main menu
 	//menuType 2 = settings
 	//menuType 3 = in game
 	//menuType 4 = pause menu
 	//menuType 5 = win screen
 	//menuType 6 = lose screen
+	//menuType 7 = highscores menu
 void DefaultSceneLayer::OnUpdate()
 {
 
 	Application& app = Application::Get();
 	currScene = app.CurrentScene();
+
 
 	double currFrame = glfwGetTime();
 	float dt = static_cast<float>(currFrame - preFrame);
@@ -139,6 +161,10 @@ void DefaultSceneLayer::OnUpdate()
 	Gameplay::GameObject::Sptr loseMenuScore = currScene->FindObjectByName("FinalScoreL");
 	Gameplay::GameObject::Sptr loseMenuB1 = currScene->FindObjectByName("Button10");
 
+	Gameplay::GameObject::Sptr highMenu = currScene->FindObjectByName("Highscores Menu");
+	Gameplay::GameObject::Sptr highMenuScore = currScene->FindObjectByName("Score Display");
+	Gameplay::GameObject::Sptr highMenuB1 = currScene->FindObjectByName("Button11");
+
 	if (uiStart == true)
 	{
 		settingsMenu->SetEnabled(false);
@@ -146,6 +172,7 @@ void DefaultSceneLayer::OnUpdate()
 		pauseMenu->SetEnabled(false);
 		winMenu->SetEnabled(false);
 		loseMenu->SetEnabled(false);
+		highMenu->SetEnabled(false);
 		uiStart = false;
 	}
 	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
@@ -255,6 +282,10 @@ void DefaultSceneLayer::OnUpdate()
 	{
 		loseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	}
+	else if (menuType == 7)
+	{
+		highMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	}
 
 	if (InputEngine::GetKeyState(GLFW_KEY_UP) == ButtonState::Pressed) //select up
 	{
@@ -355,6 +386,35 @@ void DefaultSceneLayer::OnUpdate()
 					mainMenu->RenderGUI();
 					menuType = 1;
 				}
+				if (menuSelect == 2)
+				{
+					settingsMenu->SetEnabled(false);
+					highMenu->SetEnabled(true);
+					highMenu->RenderGUI();
+					menuType = 7;
+					std::ifstream fileReader("Highscores.txt");
+					while (std::getline(fileReader, score))
+					{
+						scores.push_back(stoi(score));
+					}
+
+					BubbleSort(scores);
+
+					if (scores.size() < 5)
+					{
+						for (int i = scores.size() - 1; i >= 0; i--)
+						{
+							highMenuScore->Get<GuiText>()->SetText(highMenuScore->Get<GuiText>()->GetText() + std::to_string(scores[i]) + "\n");
+						}
+					}
+					else
+					{
+						for (int i = scores.size() - 1; i >= scores.size() - 5; i--)
+						{
+							highMenuScore->Get<GuiText>()->SetText(highMenuScore->Get<GuiText>()->GetText() + std::to_string(scores[i]) + "\n");
+						}
+					}
+				}
 			}
 			//pause menu
 			else if (menuType == 4)
@@ -381,6 +441,13 @@ void DefaultSceneLayer::OnUpdate()
 			else if (menuType == 6)
 			{
 				exit(0);
+			}
+			else if (menuType == 7)
+			{
+				highMenu->SetEnabled(false);
+				settingsMenu->SetEnabled(true);
+				settingsMenu->RenderGUI();
+				menuType = 2;
 			}
 		}
 		isButtonPressed = true;
@@ -416,6 +483,8 @@ void DefaultSceneLayer::OnUpdate()
 		}
 	}
 }
+
+
 
 
 
@@ -1115,7 +1184,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1209,7 +1278,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas2->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas2->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1248,7 +1317,7 @@ void DefaultSceneLayer::_CreateScene()
 				font->Bake();
 
 				GuiText::Sptr text = subPanel2->Add<GuiText>();
-				text->SetText("More Settings");
+				text->SetText("Highscores");
 				text->SetFont(font);
 
 			}
@@ -1304,7 +1373,7 @@ void DefaultSceneLayer::_CreateScene()
 				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
 				transform->SetMin({ 6, 10 });
 				transform->SetMax({ 110, 50 });
-				transform->SetPosition(glm::vec2(200.0f, 800.0f));
+				transform->SetPosition(glm::vec2(100.0f, 960.0f));
 
 				GuiPanel::Sptr canPanel = subPanel1->Add<GuiPanel>();
 				canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1323,7 +1392,7 @@ void DefaultSceneLayer::_CreateScene()
 				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
 				transform->SetMin({ 6, 10 });
 				transform->SetMax({ 180, 50 });
-				transform->SetPosition(glm::vec2(700.0f, 775.0f));
+				transform->SetPosition(glm::vec2(1800.0f, 960.0f));
 
 				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1343,7 +1412,7 @@ void DefaultSceneLayer::_CreateScene()
 				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
 				transform->SetMin({ 0, 10 });
 				transform->SetMax({ 10, 20 });
-				transform->SetPosition(glm::vec2(630.0f, 780.0f));
+				transform->SetPosition(glm::vec2(1730.0f, 964.0f));
 
 				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -1392,7 +1461,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas4->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas4->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1464,7 +1533,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas5->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas5->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1536,7 +1605,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas6->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(400.0f, 400.0f));
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas6->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1603,7 +1672,77 @@ void DefaultSceneLayer::_CreateScene()
 			//uiParent->AddChild(canvas6);
 		}
 
+		GameObject::Sptr canvas7 = scene->CreateGameObject("Highscores Menu");
+		{
+			RectTransform::Sptr transform = canvas7->Add<RectTransform>();
+			transform->SetMin({ 100, 100 });
+			transform->SetMax({ 700, 800 });
+			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
+			GuiPanel::Sptr canPanel = canvas7->Add<GuiPanel>();
+			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
+
+			GameObject::Sptr subPanel1 = scene->CreateGameObject("Button11");
+			{
+				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 600.0f));
+
+				GuiPanel::Sptr panel = subPanel1->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel1->Add<GuiText>();
+				text->SetText("Back");
+				text->SetFont(font);
+
+			}
+			canvas7->AddChild(subPanel1);
+
+			GameObject::Sptr subPanel2 = scene->CreateGameObject("Highscores Title");
+			{
+				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 128 });
+				transform->SetPosition(glm::vec2(300.0f, 100.0f));
+
+				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel2->Add<GuiText>();
+				text->SetText("Highscores");
+				text->SetFont(font);
+
+			}
+			canvas7->AddChild(subPanel2);
+
+			GameObject::Sptr subPanel3 = scene->CreateGameObject("Score Display");
+			{
+				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
+				transform->SetMin({ 10, 10 });
+				transform->SetMax({ 590, 354 });
+				transform->SetPosition(glm::vec2(300.0f, 350.0f));
+
+				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
+				panel->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
+				font->Bake();
+
+				GuiText::Sptr text = subPanel3->Add<GuiText>();
+				text->SetText("");
+				text->SetFont(font);
+
+			}
+			canvas7->AddChild(subPanel3);
+			//uiParent->AddChild(canvas2);
+		}
 
 		
 #pragma endregion

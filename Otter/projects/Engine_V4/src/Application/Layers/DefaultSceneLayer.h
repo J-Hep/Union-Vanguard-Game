@@ -20,6 +20,7 @@ public:
 
 	virtual void OnAppLoad(const nlohmann::json& config) override;
 	void OnUpdate() override;
+	void BubbleSort(std::vector<int>& arr);
 
 
 protected:
