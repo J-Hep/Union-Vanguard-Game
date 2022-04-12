@@ -78,12 +78,12 @@
 Application* Application::_singleton = nullptr;
 std::string Application::_applicationName = "INFR-2350U - DEMO";
 
-#define DEFAULT_WINDOW_WIDTH 1920 //1280
-#define DEFAULT_WINDOW_HEIGHT 1080 //720
+#define DEFAULT_WINDOW_WIDTH 1920
+#define DEFAULT_WINDOW_HEIGHT 1080
 
 Application::Application() :
 	_window(nullptr),
-	_windowSize({DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT}),
+	_windowSize({ DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT }),
 	_isRunning(false),
 	_isEditor(true),
 	_windowTitle("Vanguard"),

@@ -8,6 +8,7 @@ MaterialsWindow::MaterialsWindow() :
 	Name = "Materials";
 	SplitDirection = ImGuiDir_::ImGuiDir_Down;
 	SplitDepth = 0.2f;
+	Open = false;
 }
 
 MaterialsWindow::~MaterialsWindow() = default;
