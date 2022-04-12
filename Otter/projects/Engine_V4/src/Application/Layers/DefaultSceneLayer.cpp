@@ -514,6 +514,7 @@ void DefaultSceneLayer::_CreateScene()
 
 	std::vector <MeshResource::Sptr> birdAnimationFly;
 
+	float universalFrameTime = 0.05; //0.05 is our default
 
 	Application& app = Application::Get();
 
@@ -1248,6 +1249,42 @@ void DefaultSceneLayer::_CreateScene()
 			renderer->SetMesh(birdFlyMesh);
 			renderer->SetMaterial(birdFlyMaterial); //needs
 
+			MorphMeshRenderer::Sptr initialMorph = birdFly->Add<MorphMeshRenderer>();
+			initialMorph->SetMorphMeshRenderer(birdFlyMesh, birdFlyMaterial);
+			MorphAnimator::Sptr afterMorph = birdFly->Add<MorphAnimator>();
+
+			MeshResource::Sptr birdAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			for (int i = 0; i < 20; i++) {
+				birdAnimationFly.push_back(birdAnimationFrames[i]);
+			}
+
+			afterMorph->SetInitial();
+			afterMorph->SetFrameTime(universalFrameTime);
+			afterMorph->SetFrames(birdAnimationFly);
+
 			enemiesParent->AddChild(birdFly);
 		};
 
@@ -1344,7 +1381,7 @@ void DefaultSceneLayer::_CreateScene()
 			}
 
 			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrameTime(universalFrameTime);
 			afterMorph->SetFrames(goblinAnimationRunning);
 
 
@@ -1353,12 +1390,12 @@ void DefaultSceneLayer::_CreateScene()
 
 		GameObject::Sptr oozeWalk = scene->CreateGameObject("oozeWalk"); {
 			oozeWalk->SetPostion(glm::vec3(5, 0.f, 2.0f));
-			oozeWalk->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			oozeWalk->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
 			oozeWalk->SetScale(glm::vec3(1.f));
 
 			RenderComponent::Sptr renderer = oozeWalk->Add<RenderComponent>();
 			renderer->SetMesh(oozeMesh);
-			renderer->SetMaterial(animTestMaterial); //needs
+			renderer->SetMaterial(oozeMaterial); //needs
 
 			//TESTING OOZE ANIMATION
 			MorphMeshRenderer::Sptr initialMorph = oozeWalk->Add<MorphMeshRenderer>();
@@ -1394,7 +1431,7 @@ void DefaultSceneLayer::_CreateScene()
 			}
 
 			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrameTime(universalFrameTime);
 			afterMorph->SetFrames(oozeAnimationWalk);
 
 			enemiesParent->AddChild(oozeWalk);
@@ -1495,7 +1532,7 @@ void DefaultSceneLayer::_CreateScene()
 			}
 
 			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrameTime(universalFrameTime);
 			afterMorph->SetFrames(zombieAnimationDying);
 
 
