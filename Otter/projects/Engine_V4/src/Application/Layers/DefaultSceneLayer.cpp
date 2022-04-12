@@ -79,6 +79,12 @@
 
 #include <stdlib.h>
 
+//Animations
+#include "Gameplay/Components/MorphAnimator.h"
+#include "Gameplay/Components/MorphMeshRenderer.h"
+#include "CMorphMeshRenderer.h"
+#include "CMorphAnimator.h"
+
 DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
 {
@@ -103,6 +109,8 @@ int menuSelect = 1, menuType = 1;
 	//menuType 4 = pause menu
 	//menuType 5 = win screen
 	//menuType 6 = lose screen
+
+
 void DefaultSceneLayer::OnUpdate()
 {
 
@@ -138,6 +146,14 @@ void DefaultSceneLayer::OnUpdate()
 	Gameplay::GameObject::Sptr loseMenu = currScene->FindObjectByName("Lose");
 	Gameplay::GameObject::Sptr loseMenuScore = currScene->FindObjectByName("FinalScoreL");
 	Gameplay::GameObject::Sptr loseMenuB1 = currScene->FindObjectByName("Button10");
+
+
+
+	//CONTINUE
+	Gameplay::GameObject::Sptr oozeAnimAttempt = currScene->FindObjectByName("oozeWalk");
+	
+
+
 
 	if (uiStart == true)
 	{
@@ -425,6 +441,13 @@ void DefaultSceneLayer::_CreateScene()
 	using namespace Gameplay;
 	using namespace Gameplay::Physics;
 
+
+	std::vector <MeshResource::Sptr> goblinWalking;
+	std::vector <MeshResource::Sptr> goblinAttacking;
+
+	std::vector <MeshResource::Sptr> oozeAnimationWalk;
+
+
 	Application& app = Application::Get();
 
 	bool loadScene = false;
@@ -469,6 +492,12 @@ void DefaultSceneLayer::_CreateScene()
 		});
 		celShader->SetDebugName("Cel Shader");
 
+		ShaderProgram::Sptr animShader = ResourceManager::CreateAsset<ShaderProgram>(std::unordered_map<ShaderPartType, std::string>{
+			{ ShaderPartType::Vertex, "shaders/vertex_shaders/animation_morph.vert" },
+			{ ShaderPartType::Fragment, "shaders/fragment_shaders/deferred_forward.glsl" }
+		});
+		animShader->SetDebugName("Animation Shader");
+
 #pragma endregion
 
 #pragma region Loading Assets
@@ -493,6 +522,8 @@ void DefaultSceneLayer::_CreateScene()
 		MeshResource::Sptr oozeMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000001.obj");
 		MeshResource::Sptr zombieAttackMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000001.obj");
 
+		//Animation Test
+		
 
 
 		//Cannon
@@ -746,6 +777,21 @@ void DefaultSceneLayer::_CreateScene()
 			zombieAttackMaterial->Set("u_Material.AlbedoMap", zombieTexture);
 			zombieAttackMaterial->Set("u_Material.Shininess", 0.1f);
 			zombieAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
+		}
+
+
+
+		//ANIMATION MATERIAL TEST 
+		Texture2D::Sptr animTestTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animTestMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animTestMaterial->Name = "Animation Test Material";
+			animTestMaterial-> Set("u_Material.AlbedoMap", animTestMaterial);
+			animTestMaterial->Set("u_Material.Shininess", 1.0f);
+			animTestMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
 		}
 
 
@@ -1054,9 +1100,47 @@ void DefaultSceneLayer::_CreateScene()
 
 			RenderComponent::Sptr renderer = oozeWalk->Add<RenderComponent>();
 			renderer->SetMesh(oozeMesh);
-			renderer->SetMaterial(oozeMaterial); //needs
+			renderer->SetMaterial(animTestMaterial); //needs
+
+			//TESTING OOZE ANIMATION
+			MorphMeshRenderer::Sptr initialMorph = oozeWalk->Add<MorphMeshRenderer>();
+			initialMorph->SetMorphMeshRenderer(oozeMesh,animTestMaterial);
+			MorphAnimator::Sptr afterMorph = oozeWalk->Add<MorphAnimator>();
+
+			MeshResource::Sptr oozeAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			for (int i = 0; i < 20; i++) {
+				oozeAnimationWalk.push_back(oozeAnimationFrames[i]);
+			}
+
+			afterMorph->SetInitial();
+			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrames(oozeAnimationWalk);
 
 			enemiesParent->AddChild(oozeWalk);
+
 		};
 
 		GameObject::Sptr zombieAttack = scene->CreateGameObject("zombieAttack"); {

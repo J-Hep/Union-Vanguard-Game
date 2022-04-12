@@ -71,11 +71,15 @@
 #include "Layers/ParticleLayer.h"
 #include "Layers/PostProcessingLayer.h"
 
+//Animation
+#include "Gameplay/Components/MorphAnimator.h"
+#include "Gameplay/Components/MorphMeshRenderer.h"
+
 Application* Application::_singleton = nullptr;
 std::string Application::_applicationName = "INFR-2350U - DEMO";
 
-#define DEFAULT_WINDOW_WIDTH 1280
-#define DEFAULT_WINDOW_HEIGHT 720
+#define DEFAULT_WINDOW_WIDTH 1920 //1280
+#define DEFAULT_WINDOW_HEIGHT 1080 //720
 
 Application::Application() :
 	_window(nullptr),
@@ -180,8 +184,8 @@ void Application::_Run()
 	_ConfigureSettings();
 
 	// We'll grab these since we'll need them!
-	_windowSize.x = JsonGet(_appSettings, "window_width", DEFAULT_WINDOW_WIDTH);
-	_windowSize.y = JsonGet(_appSettings, "window_height", DEFAULT_WINDOW_HEIGHT);
+	_windowSize.x = JsonGet(_appSettings, "window_width", DEFAULT_WINDOW_WIDTH); //DEFULAT_WINDOW_WIDTH
+	_windowSize.y = JsonGet(_appSettings, "window_height", DEFAULT_WINDOW_HEIGHT); //DEFAULT_WINDOW_HEIGHT
 
 	// By default, we want our viewport to be the whole screen
 	_primaryViewport = { 0, 0, _windowSize.x, _windowSize.y };
@@ -297,6 +301,10 @@ void Application::_RegisterClasses()
 
 	ComponentManager::RegisterType<EnemyMovement>();
 	ComponentManager::RegisterType<CameraVanguard>();
+
+	ComponentManager::RegisterType<MorphAnimator>();
+	ComponentManager::RegisterType<MorphMeshRenderer>();
+
 }
 
 void Application::_Load() {
