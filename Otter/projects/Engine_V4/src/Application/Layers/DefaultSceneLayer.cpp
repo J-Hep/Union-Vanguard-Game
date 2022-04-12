@@ -500,11 +500,19 @@ void DefaultSceneLayer::_CreateScene()
 	using namespace Gameplay;
 	using namespace Gameplay::Physics;
 
+	
+	//Animation states
+	std::vector <MeshResource::Sptr> goblinAnimationRunning;
+	std::vector <MeshResource::Sptr> goblinAnimationAttacking;
+	std::vector <MeshResource::Sptr> goblinAnimationDying;
 
-	std::vector <MeshResource::Sptr> goblinWalking;
-	std::vector <MeshResource::Sptr> goblinAttacking;
+	std::vector <MeshResource::Sptr> zombieAnimationRunning;
+	std::vector <MeshResource::Sptr> zombieAnimationAttacking;
+	std::vector <MeshResource::Sptr> zombieAnimationDying;
 
 	std::vector <MeshResource::Sptr> oozeAnimationWalk;
+
+	std::vector <MeshResource::Sptr> birdAnimationFly;
 
 
 	Application& app = Application::Get();
@@ -846,9 +854,113 @@ void DefaultSceneLayer::_CreateScene()
 		Material::Sptr animTestMaterial = ResourceManager::CreateAsset<Material>(animShader);
 		{
 			animTestMaterial->Name = "Animation Test Material";
-			animTestMaterial-> Set("u_Material.AlbedoMap", animTestMaterial);
+			animTestMaterial-> Set("u_Material.AlbedoMap", animTestTexture);
 			animTestMaterial->Set("u_Material.Shininess", 1.0f);
 			animTestMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL OOZE
+		Texture2D::Sptr animOozeTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animOozeMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animOozeMaterial->Name = "Animation Ooze Material";
+			animOozeMaterial->Set("u_Material.AlbedoMap", animOozeTexture);
+			animOozeMaterial->Set("u_Material.Shininess", 1.0f);
+			animOozeMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL bird
+		Texture2D::Sptr animbirdTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animbirdMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animbirdMaterial->Name = "Animation Bird Material";
+			animbirdMaterial->Set("u_Material.AlbedoMap", animbirdTexture);
+			animbirdMaterial->Set("u_Material.Shininess", 1.0f);
+			animbirdMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL goblin run
+		Texture2D::Sptr animGoblinRunTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animGoblinRunMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animGoblinRunMaterial->Name = "Animation Goblin Run Material";
+			animGoblinRunMaterial->Set("u_Material.AlbedoMap", animGoblinRunTexture);
+			animGoblinRunMaterial->Set("u_Material.Shininess", 1.0f);
+			animGoblinRunMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL goblin attack
+		Texture2D::Sptr animGoblinAttackTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animGoblinAttackMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animGoblinAttackMaterial->Name = "Animation Goblin Attack Material";
+			animGoblinAttackMaterial->Set("u_Material.AlbedoMap", animGoblinAttackTexture);
+			animGoblinAttackMaterial->Set("u_Material.Shininess", 1.0f);
+			animGoblinAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL goblin death
+		Texture2D::Sptr animGoblinDeathTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animGoblinDeathMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animGoblinDeathMaterial->Name = "Animation Goblin Death Material";
+			animGoblinDeathMaterial->Set("u_Material.AlbedoMap", animGoblinDeathTexture);
+			animGoblinDeathMaterial->Set("u_Material.Shininess", 1.0f);
+			animGoblinDeathMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL zombie run
+		Texture2D::Sptr animZombieRunTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animZombieRunMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animZombieRunMaterial->Name = "Animation Zombie Run Material";
+			animZombieRunMaterial->Set("u_Material.AlbedoMap", animZombieRunTexture);
+			animZombieRunMaterial->Set("u_Material.Shininess", 1.0f);
+			animZombieRunMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL zombie attack
+		Texture2D::Sptr animZombieAttackTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animZombieAttackMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animZombieAttackMaterial->Name = "Animation Zombie Attack Material";
+			animZombieAttackMaterial->Set("u_Material.AlbedoMap", animZombieAttackTexture);
+			animZombieAttackMaterial->Set("u_Material.Shininess", 1.0f);
+			animZombieAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
+
+
+		}
+
+		//ANIMATION MATERIAL zombie death
+		Texture2D::Sptr animZombieDeathTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
+		// Create our material
+		Material::Sptr animZombieDeathMaterial = ResourceManager::CreateAsset<Material>(animShader);
+		{
+			animZombieDeathMaterial->Name = "Animation Zombie Death Material";
+			animZombieDeathMaterial->Set("u_Material.AlbedoMap", animZombieDeathTexture);
+			animZombieDeathMaterial->Set("u_Material.Shininess", 1.0f);
+			animZombieDeathMaterial->Set("u_Material.NormalMap", normalMapDefault);
 
 
 		}
@@ -1149,6 +1261,93 @@ void DefaultSceneLayer::_CreateScene()
 			//renderer->SetMaterial(goblinAttackMaterial); //needs
 			renderer->SetMaterial(toonMaterial);
 
+			MorphMeshRenderer::Sptr initialMorph = goblinAttack->Add<MorphMeshRenderer>();
+			initialMorph->SetMorphMeshRenderer(goblinAttackMesh, animGoblinAttackMaterial);
+			MorphAnimator::Sptr afterMorph = goblinAttack->Add<MorphAnimator>();
+
+			MeshResource::Sptr goblinRunningAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			MeshResource::Sptr goblinAttackAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			MeshResource::Sptr goblinDyingAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			for (int i = 0; i < 20; i++) {
+				goblinAnimationRunning.push_back(goblinRunningAnimationFrames[i]);
+				goblinAnimationAttacking.push_back(goblinAttackAnimationFrames[i]);
+				goblinAnimationDying.push_back(goblinDyingAnimationFrames[i]);
+			}
+
+			afterMorph->SetInitial();
+			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrames(goblinAnimationRunning);
+
+
 			enemiesParent->AddChild(goblinAttack);
 		};
 
@@ -1163,7 +1362,7 @@ void DefaultSceneLayer::_CreateScene()
 
 			//TESTING OOZE ANIMATION
 			MorphMeshRenderer::Sptr initialMorph = oozeWalk->Add<MorphMeshRenderer>();
-			initialMorph->SetMorphMeshRenderer(oozeMesh,animTestMaterial);
+			initialMorph->SetMorphMeshRenderer(oozeMesh,animOozeMaterial);
 			MorphAnimator::Sptr afterMorph = oozeWalk->Add<MorphAnimator>();
 
 			MeshResource::Sptr oozeAnimationFrames[] = {
@@ -1210,6 +1409,95 @@ void DefaultSceneLayer::_CreateScene()
 			RenderComponent::Sptr renderer = zombieAttack->Add<RenderComponent>();
 			renderer->SetMesh(zombieAttackMesh);
 			renderer->SetMaterial(zombieAttackMaterial); //needs
+
+
+			MorphMeshRenderer::Sptr initialMorph = zombieAttack->Add<MorphMeshRenderer>();
+			initialMorph->SetMorphMeshRenderer(zombieAttackMesh, animZombieAttackMaterial);
+			MorphAnimator::Sptr afterMorph = zombieAttack->Add<MorphAnimator>();
+
+			MeshResource::Sptr zombieRunningAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			MeshResource::Sptr zombieAttackAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+			};
+
+			MeshResource::Sptr zombieDyingAnimationFrames[] = {
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000001.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000002.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000003.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000004.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000005.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000006.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000007.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000008.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000009.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000010.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000011.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000012.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000013.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000014.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000015.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000016.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000017.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000018.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000019.obj"),
+				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000020.obj")
+				//20 FRAMES OF ANIMATIONS
+				//Does not exist so goblin used as stand in
+			};
+
+			for (int i = 0; i < 20; i++) {
+				zombieAnimationRunning.push_back(zombieRunningAnimationFrames[i]);
+				zombieAnimationAttacking.push_back(zombieAttackAnimationFrames[i]);
+				zombieAnimationDying.push_back(zombieDyingAnimationFrames[i]);
+			}
+
+			afterMorph->SetInitial();
+			afterMorph->SetFrameTime(0.2);
+			afterMorph->SetFrames(zombieAnimationDying);
+
 
 			enemiesParent->AddChild(zombieAttack);
 		};
