@@ -31,8 +31,6 @@ namespace Gameplay {
 		/// note that this will override any mesh builder params
 		/// </summary>
 		std::string                     Filename;
-
-
 		/// <summary>
 		/// The mesh builder parameters if this mesh resource is created at runtime
 		/// </summary>

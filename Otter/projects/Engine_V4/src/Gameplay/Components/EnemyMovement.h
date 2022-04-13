@@ -19,8 +19,12 @@ public:
 	virtual void Awake() override;
 	virtual void Update(float deltaTime) override;
 	virtual void OnEnteredTrigger(const std::shared_ptr<Gameplay::Physics::TriggerVolume>& trigger) override;
+	virtual void OnTriggerVolumeEntered(const std::shared_ptr<Gameplay::Physics::RigidBody>& body) override;
 
 	void setGameObject(Gameplay::GameObject::Sptr object);
+
+	void setIsSpawned(bool value);
+	bool getIsSpawned();
 
 public:
 	virtual void RenderImGui() override;
@@ -31,6 +35,9 @@ public:
 protected:
 	float _moveSpeed;
 	float _damage;
+	float _isSpawned;
+
+	glm::vec3 initPos;
 
 	Gameplay::Physics::RigidBody::Sptr _body;
 	Gameplay::GameObject::Sptr _gameObject;

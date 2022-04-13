@@ -20,7 +20,6 @@ public:
 
 	virtual void OnAppLoad(const nlohmann::json& config) override;
 	void OnUpdate() override;
-	void BubbleSort(std::vector<int>& arr);
 
 
 protected:
@@ -33,6 +32,14 @@ protected:
 	float powerLevel = 0.f;
 	float shootTimer = 0.f;
 	float shootTime = 1.75f;
+
+	//enemy spawn variables
+	float enemySpawnTimer = 0.f;
+	float newSpawnDelay = 20.f;
+	int	enemyInstances = 1;
+	int enemySpawnCount = 0;
+
+	Gameplay::GameObject::Sptr enemiesGroup[20];
 
 	bool sPressed = false;
 	bool isPaused = false;

@@ -10,7 +10,6 @@ TextureWindow::TextureWindow() :
 	ParentName = "Materials";
 	SplitDirection = ImGuiDir_::ImGuiDir_Right;
 	SplitDepth = 0.5f;
-	Open = false;
 }
 
 TextureWindow::~TextureWindow() = default;

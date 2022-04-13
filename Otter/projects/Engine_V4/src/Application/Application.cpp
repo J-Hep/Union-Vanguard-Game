@@ -71,19 +71,15 @@
 #include "Layers/ParticleLayer.h"
 #include "Layers/PostProcessingLayer.h"
 
-//Animation
-#include "Gameplay/Components/MorphAnimator.h"
-#include "Gameplay/Components/MorphMeshRenderer.h"
-
 Application* Application::_singleton = nullptr;
 std::string Application::_applicationName = "INFR-2350U - DEMO";
 
-#define DEFAULT_WINDOW_WIDTH 1920
-#define DEFAULT_WINDOW_HEIGHT 1080
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
 
 Application::Application() :
 	_window(nullptr),
-	_windowSize({ DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT }),
+	_windowSize({DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT}),
 	_isRunning(false),
 	_isEditor(true),
 	_windowTitle("Vanguard"),
@@ -168,6 +164,7 @@ void Application::_Run()
 
 	// TODO: Register layers
 	_layers.push_back(std::make_shared<GLAppLayer>());
+	_layers.push_back(std::make_shared<DefaultSceneLayer>());
 	_layers.push_back(std::make_shared<LogicUpdateLayer>());
 	_layers.push_back(std::make_shared<RenderLayer>());
 	_layers.push_back(std::make_shared<ParticleLayer>());
@@ -179,13 +176,12 @@ void Application::_Run()
 		_layers.push_back(std::make_shared<ImGuiDebugLayer>());
 	}
 
-	_layers.push_back(std::make_shared<DefaultSceneLayer>());
 	// Either load the settings, or use the defaults
 	_ConfigureSettings();
 
 	// We'll grab these since we'll need them!
-	_windowSize.x = JsonGet(_appSettings, "window_width", DEFAULT_WINDOW_WIDTH); //DEFULAT_WINDOW_WIDTH
-	_windowSize.y = JsonGet(_appSettings, "window_height", DEFAULT_WINDOW_HEIGHT); //DEFAULT_WINDOW_HEIGHT
+	_windowSize.x = JsonGet(_appSettings, "window_width", DEFAULT_WINDOW_WIDTH);
+	_windowSize.y = JsonGet(_appSettings, "window_height", DEFAULT_WINDOW_HEIGHT);
 
 	// By default, we want our viewport to be the whole screen
 	_primaryViewport = { 0, 0, _windowSize.x, _windowSize.y };
@@ -301,10 +297,6 @@ void Application::_RegisterClasses()
 
 	ComponentManager::RegisterType<EnemyMovement>();
 	ComponentManager::RegisterType<CameraVanguard>();
-
-	ComponentManager::RegisterType<MorphAnimator>();
-	ComponentManager::RegisterType<MorphMeshRenderer>();
-
 }
 
 void Application::_Load() {

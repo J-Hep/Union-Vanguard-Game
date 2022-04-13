@@ -77,17 +77,6 @@
 #include "Graphics/Textures/Texture3D.h"
 #include "Graphics/Textures/Texture1D.h"
 
-#include <stdlib.h>
-#include <iostream>
-#include <fstream>
-#include <vector>
-
-//Animations
-#include "Gameplay/Components/MorphAnimator.h"
-#include "Gameplay/Components/MorphMeshRenderer.h"
-#include "CMorphMeshRenderer.h"
-#include "CMorphAnimator.h"
-
 DefaultSceneLayer::DefaultSceneLayer() :
 	ApplicationLayer()
 {
@@ -101,396 +90,126 @@ void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 	_CreateScene();
 }
 
-void DefaultSceneLayer::BubbleSort(std::vector<int>& arr)
-{
-	bool swap = true;
-	while (swap) {
-		swap = false;
-		for (size_t i = 0; i < arr.size() - 1; i++) {
-			if (arr[i] > arr[i + 1]) {
-				arr[i] += arr[i + 1];
-				arr[i + 1] = arr[i] - arr[i + 1];
-				arr[i] -= arr[i + 1];
-				swap = true;
-			}
-		}
-	}
-}
 
-double preFrame = glfwGetTime();
-bool uiStart = true;
-bool isButtonPressed = false;
-int menuSelect = 1, menuType = 1;
-std::vector<int> scores;
-std::string score;
-	//menuType 1 = main menu
-	//menuType 2 = settings
-	//menuType 3 = in game
-	//menuType 4 = pause menu
-	//menuType 5 = win screen
-	//menuType 6 = lose screen
-	//menuType 7 = highscores menu
+//double preFrame = glfwGetTime();
 void DefaultSceneLayer::OnUpdate()
 {
+	double preFrame = glfwGetTime();
 
 	Application& app = Application::Get();
 	currScene = app.CurrentScene();
 
-
 	double currFrame = glfwGetTime();
 	float dt = static_cast<float>(currFrame - preFrame);
 
-	Gameplay::GameObject::Sptr mainMenu = currScene->FindObjectByName("Main Menu");
-	Gameplay::GameObject::Sptr mainMenuB1 = currScene->FindObjectByName("Button1");
-	Gameplay::GameObject::Sptr mainMenuB2 = currScene->FindObjectByName("Button2");
-	Gameplay::GameObject::Sptr mainMenuB3 = currScene->FindObjectByName("Button3");
-
-	Gameplay::GameObject::Sptr settingsMenu = currScene->FindObjectByName("Settings Menu");
-	Gameplay::GameObject::Sptr settingsMenuB1 = currScene->FindObjectByName("Button4");
-	Gameplay::GameObject::Sptr settingsMenuB2 = currScene->FindObjectByName("Button5");
-	Gameplay::GameObject::Sptr settingsMenuB3 = currScene->FindObjectByName("Button6");
-
-	Gameplay::GameObject::Sptr inGame = currScene->FindObjectByName("inGameGUI");
-	Gameplay::GameObject::Sptr inGameScore = currScene->FindObjectByName("Score");
-	Gameplay::GameObject::Sptr inGamePower = currScene->FindObjectByName("Charge Level");
-	Gameplay::GameObject::Sptr inGameHealth = currScene->FindObjectByName("Health Level");
-
-	Gameplay::GameObject::Sptr pauseMenu = currScene->FindObjectByName("Pause Menu");
-	Gameplay::GameObject::Sptr pauseMenuB1 = currScene->FindObjectByName("Button7");
-	Gameplay::GameObject::Sptr pauseMenuB2 = currScene->FindObjectByName("Button8");
-
-	Gameplay::GameObject::Sptr winMenu = currScene->FindObjectByName("Win");
-	Gameplay::GameObject::Sptr winMenuScore = currScene->FindObjectByName("FinalScoreW");
-	Gameplay::GameObject::Sptr winMenuB1 = currScene->FindObjectByName("Button9");
-
-	Gameplay::GameObject::Sptr loseMenu = currScene->FindObjectByName("Lose");
-	Gameplay::GameObject::Sptr loseMenuScore = currScene->FindObjectByName("FinalScoreL");
-	Gameplay::GameObject::Sptr loseMenuB1 = currScene->FindObjectByName("Button10");
-
-	Gameplay::GameObject::Sptr highMenu = currScene->FindObjectByName("Highscores Menu");
-	Gameplay::GameObject::Sptr highMenuScore = currScene->FindObjectByName("Score Display");
-	Gameplay::GameObject::Sptr highMenuB1 = currScene->FindObjectByName("Button11");
-
-	if (uiStart == true)
+	if (!start)
 	{
-		settingsMenu->SetEnabled(false);
-		inGame->SetEnabled(false);
-		pauseMenu->SetEnabled(false);
-		winMenu->SetEnabled(false);
-		loseMenu->SetEnabled(false);
-		highMenu->SetEnabled(false);
-		uiStart = false;
-	}
-	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
-	{
-		if (!isButtonPressed)
+		if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)
 		{
-			if (currScene->IsPlaying == true)
+			sPressed = true;
+			currScene->IsPlaying = true;
+
+		}
+				
+		if (sPressed)
+		{
+			start = true;
+			sPressed = false;
+			AudioEngine::playEvents("event:/Daytime Song");
+		}
+
+		if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
+			//shoot then reset wait timer
+			if (shootPower < 70)
 			{
-				pauseMenu->SetEnabled(true);
-				inGame->SetEnabled(false);
-				currScene->IsPlaying = false;
-				menuType = 4;
-			}
-			//possible pause sound effect could go here                                       <------------------ GABE LOOK HERE!!!!
-			isButtonPressed = true;
-		}
-	}
-	else
-	{
-		isButtonPressed = false;
-	}
-	if (menuType == 1)
-	{
-		//main menu button selection 
-		if (menuSelect == 1)
-		{
-			mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-			//mainMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(1.0f));
-		}
-		if (menuSelect == 2)
-		{
-			mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			mainMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-		if (menuSelect == 3)
-		{
-			mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			mainMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}		
-	}
-	//settings selection color
-	else if (menuType == 2)
-	{
-		//main menu button selection 
-		if (menuSelect == 1)
-		{
-			settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			settingsMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-		if (menuSelect == 2)
-		{
-			settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			settingsMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-		if (menuSelect == 3)
-		{
-			settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			settingsMenuB3->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-	}
-	//pause selection color
-	else if (menuType == 4)
-	{
-		if (menuSelect == 1)
-		{
-			pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			pauseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-		if (menuSelect == 2)
-		{
-			pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-		}
-		else
-		{
-			pauseMenuB2->Get<GuiPanel>()->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-		}
-	}
-	//win screen selection color
-	else if (menuType == 5)
-	{
-		winMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	}
-	//lose screen selection color
-	else if (menuType == 6)
-	{
-		loseMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	}
-	else if (menuType == 7)
-	{
-		highMenuB1->Get<GuiPanel>()->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	}
-
-	if (InputEngine::GetKeyState(GLFW_KEY_UP) == ButtonState::Pressed) //select up
-	{
-		if (!isButtonPressed)
-		{
-			if (menuType == 4)
-			{
-				if (menuSelect == 1)
-				{
-					menuSelect = 2;
-				}
-				else
-				{
-					menuSelect = 1;
-				}
+				shootPower += dt * 20.0f;
 			}
 			else
 			{
-				if (menuSelect == 1)
-				{
-					menuSelect = 3;
-				}
-				else
-				{
-					menuSelect--;
-				}
+				shootPower = 70.0f;
 			}
-			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			charging = true;
+			powerLevel = (shootPower / 70);
 		}
-		isButtonPressed = true;
-	}
-	else if (InputEngine::GetKeyState(GLFW_KEY_DOWN) == ButtonState::Pressed) //select down
-	{
-		if (!isButtonPressed)
+		else
 		{
-			if (menuType == 4)
+			if (charging == true)
 			{
-				if (menuSelect == 2)
-				{
-					menuSelect = 1;
-				}
-				else
-				{
-					menuSelect = 2;
-				}
-			}
-			else
-			{
-				if (menuSelect == 3)
-				{
-					menuSelect = 1;
-				}
-				else
-				{
-					menuSelect++;
-				}
-			}
-			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
-		}
-		isButtonPressed = true;
-	}
-	else if (InputEngine::GetKeyState(GLFW_KEY_ENTER) == ButtonState::Pressed)  //button selection
-	{
-		if (!isButtonPressed)
-		{
-			//button click sound goes here                                       <------------------ GABE LOOK HERE!!!!
-			//main menu
-			if (menuType == 1)
-			{
-				if (menuSelect == 1)
-				{
-					mainMenu->SetEnabled(false);
-					inGame->SetEnabled(true);
-					inGame->RenderGUI();
-					menuType = 3;
-					currScene->IsPlaying = true;
-					AudioEngine::playEvents("event:/Daytime Song");
-				}
-				if (menuSelect == 2)
-				{
-					mainMenu->SetEnabled(false);
-					settingsMenu->SetEnabled(true);
-					settingsMenu->RenderGUI();
-					menuType = 2;
-				}
-				if (menuSelect == 3)
-				{
-					exit(0);
-				}
-			}
-			//settings
-			else if (menuType == 2)
-			{
-				if (menuSelect == 3)
-				{
-					settingsMenu->SetEnabled(false);
-					mainMenu->SetEnabled(true);
-					mainMenu->RenderGUI();
-					menuType = 1;
-				}
-				if (menuSelect == 2)
-				{
-					settingsMenu->SetEnabled(false);
-					highMenu->SetEnabled(true);
-					highMenu->RenderGUI();
-					menuType = 7;
-					std::ifstream fileReader("Highscores.txt");
-					while (std::getline(fileReader, score))
-					{
-						scores.push_back(stoi(score));
-					}
+				//spawn cannonball in the lane we're looking at
 
-					BubbleSort(scores);
-
-					if (scores.size() < 5)
-					{
-						for (int i = scores.size() - 1; i >= 0; i--)
-						{
-							highMenuScore->Get<GuiText>()->SetText(highMenuScore->Get<GuiText>()->GetText() + std::to_string(scores[i]) + "\n");
-						}
-					}
-					else
-					{
-						for (int i = scores.size() - 1; i >= scores.size() - 5; i--)
-						{
-							highMenuScore->Get<GuiText>()->SetText(highMenuScore->Get<GuiText>()->GetText() + std::to_string(scores[i]) + "\n");
-						}
-					}
-				}
-			}
-			//pause menu
-			else if (menuType == 4)
-			{
-				if (menuSelect == 1)
-				{
-					exit(0);
-				}
-				else if (menuSelect == 2)
-				{
-					pauseMenu->SetEnabled(false);
-					inGame->SetEnabled(true);
-					inGame->RenderGUI();
-					menuType = 3;
-					currScene->IsPlaying = true;
-				}
-			}
-			//win screen
-			else if (menuType == 5)
-			{
-				exit(0);
-			}
-			//lose screen
-			else if (menuType == 6)
-			{
-				exit(0);
-			}
-			else if (menuType == 7)
-			{
-				highMenu->SetEnabled(false);
-				settingsMenu->SetEnabled(true);
-				settingsMenu->RenderGUI();
-				menuType = 2;
+				canShoot = false;
+				shootTimer = shootTime;
+				shootPower = 5.0f;
+				charging = false;
 			}
 		}
-		isButtonPressed = true;
+
+		//spawnenemies(dt)
+		enemySpawnTimer += dt * 0.25;
+		if (enemySpawnTimer >= newSpawnDelay) {
+			enemySpawnTimer = 0;
+			std::cout << "ENEMY SPAWN TIMER IS " << enemySpawnTimer << ", delay is: " << newSpawnDelay << '\n';
+				std::cout << enemyInstances << " ENEMIES SPAWNING!!!!!!!\n";
+				int tempCounter = 0;
+			for (int i = 0; i < enemyInstances; i++) {
+				//if enemy[i] . isSpawned is false, 
+				//enemy.isSpawned is true,
+				//pick lane
+				//spawn count ++
+				std::cout << i << ".isSpawned: " << enemiesGroup[i]->Get<EnemyMovement>()->getIsSpawned() << "\n";
+				if (enemiesGroup[i]->Get<EnemyMovement>()->getIsSpawned() == false) {
+					enemiesGroup[i]->Get<EnemyMovement>()->setIsSpawned(true);
+					enemySpawnCount++;
+					int lane = rand() % 4;
+					std::cout << "Lane: " << lane << '\n';
+					switch (lane)
+					{
+					case 0: 
+						//lane 1
+						tempCounter++;
+						enemiesGroup[i]->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+						enemiesGroup[i]->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+						enemiesGroup[i]->SetScale(glm::vec3(2.0f));
+						break;
+					case 2:
+						//lane 1
+						tempCounter++;
+						enemiesGroup[i]->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+						enemiesGroup[i]->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+						enemiesGroup[i]->SetScale(glm::vec3(2.0f));
+						break;
+					case 3:
+						//lane 1
+						tempCounter++;
+						enemiesGroup[i]->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+						enemiesGroup[i]->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+						enemiesGroup[i]->SetScale(glm::vec3(2.0f));
+						break;
+					case 4:
+						//lane 1
+						tempCounter++;
+						enemiesGroup[i]->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
+						enemiesGroup[i]->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+						enemiesGroup[i]->SetScale(glm::vec3(2.0f));
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			std::cout << tempCounter << " enemies spawned!!\n";
+
+			if(enemySpawnCount % 10 == 0) enemyInstances++;
+			if (enemyInstances > 9) enemyInstances = 9;
+		}
+
+		newSpawnDelay = (enemySpawnCount+1 % 5 == 0 ? newSpawnDelay-0.125f : newSpawnDelay);
+
 	}
-	else
-	{
-		isButtonPressed = false;
-	}
+
+
 	
-	if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
-		//shoot then reset wait timer
-		if (shootPower < 70)
-		{
-			shootPower += dt * 20.0f;
-		}
-		else
-		{
-			shootPower = 70.0f;
-		}
-		charging = true;
-		powerLevel = (shootPower / 70);
-	}
-	else
-	{
-		if (charging == true)
-		{
-			//spawn cannonball in the lane we're looking at
-
-			canShoot = false;
-			shootTimer = shootTime;
-			shootPower = 5.0f;
-			charging = false;
-		}
-	}
 }
-
-
 
 
 
@@ -499,22 +218,6 @@ void DefaultSceneLayer::_CreateScene()
 {
 	using namespace Gameplay;
 	using namespace Gameplay::Physics;
-
-	
-	//Animation states
-	std::vector <MeshResource::Sptr> goblinAnimationRunning;
-	std::vector <MeshResource::Sptr> goblinAnimationAttacking;
-	std::vector <MeshResource::Sptr> goblinAnimationDying;
-
-	std::vector <MeshResource::Sptr> zombieAnimationRunning;
-	std::vector <MeshResource::Sptr> zombieAnimationAttacking;
-	std::vector <MeshResource::Sptr> zombieAnimationDying;
-
-	std::vector <MeshResource::Sptr> oozeAnimationWalk;
-
-	std::vector <MeshResource::Sptr> birdAnimationFly;
-
-	float universalFrameTime = 0.05; //0.05 is our default
 
 	Application& app = Application::Get();
 
@@ -560,12 +263,6 @@ void DefaultSceneLayer::_CreateScene()
 		});
 		celShader->SetDebugName("Cel Shader");
 
-		ShaderProgram::Sptr animShader = ResourceManager::CreateAsset<ShaderProgram>(std::unordered_map<ShaderPartType, std::string>{
-			{ ShaderPartType::Vertex, "shaders/vertex_shaders/animation_morph.vert" },
-			{ ShaderPartType::Fragment, "shaders/fragment_shaders/deferred_forward.glsl" }
-		});
-		animShader->SetDebugName("Animation Shader");
-
 #pragma endregion
 
 #pragma region Loading Assets
@@ -590,8 +287,6 @@ void DefaultSceneLayer::_CreateScene()
 		MeshResource::Sptr oozeMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000001.obj");
 		MeshResource::Sptr zombieAttackMesh = ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000001.obj");
 
-		//Animation Test
-		
 
 
 		//Cannon
@@ -848,125 +543,6 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 
-
-		//ANIMATION MATERIAL TEST 
-		Texture2D::Sptr animTestTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animTestMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animTestMaterial->Name = "Animation Test Material";
-			animTestMaterial-> Set("u_Material.AlbedoMap", animTestTexture);
-			animTestMaterial->Set("u_Material.Shininess", 1.0f);
-			animTestMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL OOZE
-		Texture2D::Sptr animOozeTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animOozeMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animOozeMaterial->Name = "Animation Ooze Material";
-			animOozeMaterial->Set("u_Material.AlbedoMap", animOozeTexture);
-			animOozeMaterial->Set("u_Material.Shininess", 1.0f);
-			animOozeMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL bird
-		Texture2D::Sptr animbirdTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animbirdMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animbirdMaterial->Name = "Animation Bird Material";
-			animbirdMaterial->Set("u_Material.AlbedoMap", animbirdTexture);
-			animbirdMaterial->Set("u_Material.Shininess", 1.0f);
-			animbirdMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL goblin run
-		Texture2D::Sptr animGoblinRunTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animGoblinRunMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animGoblinRunMaterial->Name = "Animation Goblin Run Material";
-			animGoblinRunMaterial->Set("u_Material.AlbedoMap", animGoblinRunTexture);
-			animGoblinRunMaterial->Set("u_Material.Shininess", 1.0f);
-			animGoblinRunMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL goblin attack
-		Texture2D::Sptr animGoblinAttackTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animGoblinAttackMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animGoblinAttackMaterial->Name = "Animation Goblin Attack Material";
-			animGoblinAttackMaterial->Set("u_Material.AlbedoMap", animGoblinAttackTexture);
-			animGoblinAttackMaterial->Set("u_Material.Shininess", 1.0f);
-			animGoblinAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL goblin death
-		Texture2D::Sptr animGoblinDeathTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animGoblinDeathMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animGoblinDeathMaterial->Name = "Animation Goblin Death Material";
-			animGoblinDeathMaterial->Set("u_Material.AlbedoMap", animGoblinDeathTexture);
-			animGoblinDeathMaterial->Set("u_Material.Shininess", 1.0f);
-			animGoblinDeathMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL zombie run
-		Texture2D::Sptr animZombieRunTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animZombieRunMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animZombieRunMaterial->Name = "Animation Zombie Run Material";
-			animZombieRunMaterial->Set("u_Material.AlbedoMap", animZombieRunTexture);
-			animZombieRunMaterial->Set("u_Material.Shininess", 1.0f);
-			animZombieRunMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL zombie attack
-		Texture2D::Sptr animZombieAttackTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animZombieAttackMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animZombieAttackMaterial->Name = "Animation Zombie Attack Material";
-			animZombieAttackMaterial->Set("u_Material.AlbedoMap", animZombieAttackTexture);
-			animZombieAttackMaterial->Set("u_Material.Shininess", 1.0f);
-			animZombieAttackMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-		//ANIMATION MATERIAL zombie death
-		Texture2D::Sptr animZombieDeathTexture = ResourceManager::CreateAsset<Texture2D>("textures/Animated/oozeuvspot.png");
-		// Create our material
-		Material::Sptr animZombieDeathMaterial = ResourceManager::CreateAsset<Material>(animShader);
-		{
-			animZombieDeathMaterial->Name = "Animation Zombie Death Material";
-			animZombieDeathMaterial->Set("u_Material.AlbedoMap", animZombieDeathTexture);
-			animZombieDeathMaterial->Set("u_Material.Shininess", 1.0f);
-			animZombieDeathMaterial->Set("u_Material.NormalMap", normalMapDefault);
-
-
-		}
-
-
 		//Cannon stuff
 		Material::Sptr cannonBaseMaterial = ResourceManager::CreateAsset<Material>(deferredForward);
 		{
@@ -1101,6 +677,8 @@ void DefaultSceneLayer::_CreateScene()
 			renderer->SetMesh(winterGardenMesh);
 			renderer->SetMaterial(winterGardenMaterial);
 
+			
+
 			mapParent->AddChild(WinterGarden);
 		}
 
@@ -1201,42 +779,46 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 
-		GameObject::Sptr goblin1 = scene->CreateGameObject("goblin1");
-		{
-			// Set position in the scene
-			goblin1->SetPostion(glm::vec3(12.760f, 0.0f, 1.0f));
-			goblin1->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
-			goblin1->SetScale(glm::vec3(2.0f));
+		for (int i = 0; i < 10; i++) {
+			std::string name = "goblin";
+			name += std::to_string(i);
+			GameObject::Sptr goblin = scene->CreateGameObject(name);
+			{
+				// Set position in the scene
+				goblin->SetPostion(glm::vec3(12.760f*i, -50.0f, 1.0f));
+				goblin->SetRotation(glm::vec3(90.0f, 0.0f, -90.0f));
+				goblin->SetScale(glm::vec3(2.0f));
 
-			// Add some behaviour that relies on the physics body
-			//towerGarden->Add<JumpBehaviour>();
+				// Add some behaviour that relies on the physics body
+				//towerGarden->Add<JumpBehaviour>();
 
-			// Create and attach a renderer for the monkey
-			RenderComponent::Sptr renderer = goblin1->Add<RenderComponent>();
-			renderer->SetMesh(newGoblinMesh);
-			//renderer->SetMaterial(goblinMaterial);
-			toonMaterial->Set("u_Material.WorldPos", goblin1->GetPosition());
-			renderer->SetMaterial(toonMaterial);
+				// Create and attach a renderer for the monkey
+				RenderComponent::Sptr renderer = goblin->Add<RenderComponent>();
+				renderer->SetMesh(newGoblinMesh);
+				//renderer->SetMaterial(goblinMaterial);
+				toonMaterial->Set("u_Material.WorldPos", goblin->GetPosition());
+				renderer->SetMaterial(toonMaterial);
 
-			//RigidBody::Sptr goblinRB = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
-			//goblinRB->AddCollider(BoxCollider::Create())->SetPosition(glm::vec3(0.f));
+				//RigidBody::Sptr goblinRB = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
+				//goblinRB->AddCollider(BoxCollider::Create())->SetPosition(glm::vec3(0.f));
 
-			TriggerVolume::Sptr volume = goblin1->Add<TriggerVolume>();
-			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
-			volume->AddCollider(col);
+				TriggerVolume::Sptr volume = goblin->Add<TriggerVolume>();
+				CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
+				volume->AddCollider(col);
 
-			goblin1->Add<TriggerVolumeEnterBehaviour>();
-			goblin1->Add<EnemyMovement>();
+				goblin->Add<TriggerVolumeEnterBehaviour>();
+				goblin->Add<EnemyMovement>();
 
-			goblin1->Get<EnemyMovement>()->setGameObject(goblin1);
-			
+				goblin->Get<EnemyMovement>()->setGameObject(goblin);
+				goblin->Get<EnemyMovement>()->setIsSpawned(false);
 
-			// Add a dynamic rigid body to this monkey
-			RigidBody::Sptr physics = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
-			physics->AddCollider(ConvexMeshCollider::Create());
+				// Add a dynamic rigid body to this monkey
+				RigidBody::Sptr physics = goblin->Add<RigidBody>(RigidBodyType::Dynamic);
+				physics->AddCollider(ConvexMeshCollider::Create());
 
-			enemiesParent->AddChild(goblin1);
-
+				enemiesParent->AddChild(goblin);
+			}
+			enemiesGroup[i] = goblin;
 		}
 
 		//Frame 1 stuff and more stuff
@@ -1248,42 +830,6 @@ void DefaultSceneLayer::_CreateScene()
 			RenderComponent::Sptr renderer = birdFly->Add<RenderComponent>();
 			renderer->SetMesh(birdFlyMesh);
 			renderer->SetMaterial(birdFlyMaterial); //needs
-
-			MorphMeshRenderer::Sptr initialMorph = birdFly->Add<MorphMeshRenderer>();
-			initialMorph->SetMorphMeshRenderer(birdFlyMesh, birdFlyMaterial);
-			MorphAnimator::Sptr afterMorph = birdFly->Add<MorphAnimator>();
-
-			MeshResource::Sptr birdAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Bird/Birdfly_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			for (int i = 0; i < 20; i++) {
-				birdAnimationFly.push_back(birdAnimationFrames[i]);
-			}
-
-			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(universalFrameTime);
-			afterMorph->SetFrames(birdAnimationFly);
 
 			enemiesParent->AddChild(birdFly);
 		};
@@ -1298,144 +844,19 @@ void DefaultSceneLayer::_CreateScene()
 			//renderer->SetMaterial(goblinAttackMaterial); //needs
 			renderer->SetMaterial(toonMaterial);
 
-			MorphMeshRenderer::Sptr initialMorph = goblinAttack->Add<MorphMeshRenderer>();
-			initialMorph->SetMorphMeshRenderer(goblinAttackMesh, animGoblinAttackMaterial);
-			MorphAnimator::Sptr afterMorph = goblinAttack->Add<MorphAnimator>();
-
-			MeshResource::Sptr goblinRunningAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/Run/GoblinRun_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			MeshResource::Sptr goblinAttackAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/attack/GoblinAttack_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			MeshResource::Sptr goblinDyingAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Goblin/die/Goblindie_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			for (int i = 0; i < 20; i++) {
-				goblinAnimationRunning.push_back(goblinRunningAnimationFrames[i]);
-				goblinAnimationAttacking.push_back(goblinAttackAnimationFrames[i]);
-				goblinAnimationDying.push_back(goblinDyingAnimationFrames[i]);
-			}
-
-			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(universalFrameTime);
-			afterMorph->SetFrames(goblinAnimationRunning);
-
-
 			enemiesParent->AddChild(goblinAttack);
 		};
 
 		GameObject::Sptr oozeWalk = scene->CreateGameObject("oozeWalk"); {
 			oozeWalk->SetPostion(glm::vec3(5, 0.f, 2.0f));
-			oozeWalk->SetRotation(glm::vec3(90.0f, 0.0f, 90.0f));
+			oozeWalk->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 			oozeWalk->SetScale(glm::vec3(1.f));
 
 			RenderComponent::Sptr renderer = oozeWalk->Add<RenderComponent>();
 			renderer->SetMesh(oozeMesh);
 			renderer->SetMaterial(oozeMaterial); //needs
 
-			//TESTING OOZE ANIMATION
-			MorphMeshRenderer::Sptr initialMorph = oozeWalk->Add<MorphMeshRenderer>();
-			initialMorph->SetMorphMeshRenderer(oozeMesh,animOozeMaterial);
-			MorphAnimator::Sptr afterMorph = oozeWalk->Add<MorphAnimator>();
-
-			MeshResource::Sptr oozeAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Ooze/walk/oozewalk_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			for (int i = 0; i < 20; i++) {
-				oozeAnimationWalk.push_back(oozeAnimationFrames[i]);
-			}
-
-			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(universalFrameTime);
-			afterMorph->SetFrames(oozeAnimationWalk);
-
 			enemiesParent->AddChild(oozeWalk);
-
 		};
 
 		GameObject::Sptr zombieAttack = scene->CreateGameObject("zombieAttack"); {
@@ -1447,95 +868,6 @@ void DefaultSceneLayer::_CreateScene()
 			renderer->SetMesh(zombieAttackMesh);
 			renderer->SetMaterial(zombieAttackMaterial); //needs
 
-
-			MorphMeshRenderer::Sptr initialMorph = zombieAttack->Add<MorphMeshRenderer>();
-			initialMorph->SetMorphMeshRenderer(zombieAttackMesh, animZombieAttackMaterial);
-			MorphAnimator::Sptr afterMorph = zombieAttack->Add<MorphAnimator>();
-
-			MeshResource::Sptr zombieRunningAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/run/ZombieRun_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			MeshResource::Sptr zombieAttackAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/attack/ZombieAttack_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-			};
-
-			MeshResource::Sptr zombieDyingAnimationFrames[] = {
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000001.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000002.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000003.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000004.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000005.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000006.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000007.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000008.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000009.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000010.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000011.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000012.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000013.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000014.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000015.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000016.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000017.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000018.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000019.obj"),
-				ResourceManager::CreateAsset<MeshResource>("models/Animated/Zombie/die/zombieDie_000020.obj")
-				//20 FRAMES OF ANIMATIONS
-				//Does not exist so goblin used as stand in
-			};
-
-			for (int i = 0; i < 20; i++) {
-				zombieAnimationRunning.push_back(zombieRunningAnimationFrames[i]);
-				zombieAnimationAttacking.push_back(zombieAttackAnimationFrames[i]);
-				zombieAnimationDying.push_back(zombieDyingAnimationFrames[i]);
-			}
-
-			afterMorph->SetInitial();
-			afterMorph->SetFrameTime(universalFrameTime);
-			afterMorph->SetFrames(zombieAnimationDying);
-
-
 			enemiesParent->AddChild(zombieAttack);
 		};
 		
@@ -1545,45 +877,15 @@ void DefaultSceneLayer::_CreateScene()
 #pragma region UI creation
 
 		//pain
+
 /*
-		GameObject::Sptr canvas = scene->CreateGameObject("UI Canvas");
-		{
-			RectTransform::Sptr transform = canvas->Add<RectTransform>();
-			transform->SetMin({ 16, 16 });
-			transform->SetMax({ 128, 128 });
-			transform->SetPosition(glm::vec2(100.0f, 177.0f));
-			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
-
-
-			GameObject::Sptr subPanel = scene->CreateGameObject("Sub Item");
-			{
-				RectTransform::Sptr transform = subPanel->Add<RectTransform>();
-				transform->SetMin({ 10, 10 });
-				transform->SetMax({ 64, 64 });
-
-				GuiPanel::Sptr panel = subPanel->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/upArrow.png"));
-
-				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 16.0f);
-				font->Bake();
-
-				GuiText::Sptr text = subPanel->Add<GuiText>();
-				text->SetText("Hello world!");
-				text->SetFont(font);
-
-			}
-
-			canvas->AddChild(subPanel);
-		}*/
-		///////////////////////////// UI //////////////////////////////
+		/////////////////////////// UI //////////////////////////////
 		GameObject::Sptr canvas = scene->CreateGameObject("Main Menu");
 		{
 			RectTransform::Sptr transform = canvas->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1669,7 +971,7 @@ void DefaultSceneLayer::_CreateScene()
 			}
 			canvas->AddChild(subPanel4);
 
-			//uiParent->AddChild(canvas);
+			uiParent->AddChild(canvas);
 		}
 
 		GameObject::Sptr canvas2 = scene->CreateGameObject("Settings Menu");
@@ -1677,7 +979,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas2->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas2->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1716,7 +1018,7 @@ void DefaultSceneLayer::_CreateScene()
 				font->Bake();
 
 				GuiText::Sptr text = subPanel2->Add<GuiText>();
-				text->SetText("Highscores");
+				text->SetText("More Settings");
 				text->SetFont(font);
 
 			}
@@ -1761,18 +1063,17 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas2->AddChild(subPanel4);
-			//uiParent->AddChild(canvas2);
+			uiParent->AddChild(canvas2);
 		}
 
 		GameObject::Sptr canvas3 = scene->CreateGameObject("inGameGUI");
 		{
-			RectTransform::Sptr transform = canvas3->Add<RectTransform>();
 			GameObject::Sptr subPanel1 = scene->CreateGameObject("Score");
 			{
 				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
 				transform->SetMin({ 6, 10 });
 				transform->SetMax({ 110, 50 });
-				transform->SetPosition(glm::vec2(100.0f, 960.0f));
+				transform->SetPosition(glm::vec2(70.0f, 775.0f));
 
 				GuiPanel::Sptr canPanel = subPanel1->Add<GuiPanel>();
 				canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1791,7 +1092,7 @@ void DefaultSceneLayer::_CreateScene()
 				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
 				transform->SetMin({ 6, 10 });
 				transform->SetMax({ 180, 50 });
-				transform->SetPosition(glm::vec2(1800.0f, 960.0f));
+				transform->SetPosition(glm::vec2(700.0f, 775.0f));
 
 				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1811,11 +1112,11 @@ void DefaultSceneLayer::_CreateScene()
 				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
 				transform->SetMin({ 0, 10 });
 				transform->SetMax({ 10, 20 });
-				transform->SetPosition(glm::vec2(1730.0f, 964.0f));
+				transform->SetPosition(glm::vec2(630.0f, 780.0f));
 
 				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
 			}
 			canvas3->AddChild(subPanel3);
 
@@ -1848,11 +1149,11 @@ void DefaultSceneLayer::_CreateScene()
 
 				GuiPanel::Sptr panel = subPanel5->Add<GuiPanel>();
 				panel->SetColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-				//panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
+				panel->SetTexture(ResourceManager::CreateAsset<Texture2D>("textures/red.png"));
 
 			}
 			canvas3->AddChild(subPanel5);
-			//uiParent->AddChild(canvas3);
+			uiParent->AddChild(canvas3);
 		}
 
 		GameObject::Sptr canvas4 = scene->CreateGameObject("Pause Menu");
@@ -1860,7 +1161,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas4->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas4->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1924,7 +1225,7 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas4->AddChild(subPanel4);
-			//uiParent->AddChild(canvas4);
+			uiParent->AddChild(canvas4);
 		}
 
 		GameObject::Sptr canvas5 = scene->CreateGameObject("Win");
@@ -1932,7 +1233,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas5->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas5->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -1996,7 +1297,7 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas5->AddChild(subPanel4);
-			//uiParent->AddChild(canvas5);
+			uiParent->AddChild(canvas5);
 		}
 
 		GameObject::Sptr canvas6 = scene->CreateGameObject("Lose");
@@ -2004,7 +1305,7 @@ void DefaultSceneLayer::_CreateScene()
 			RectTransform::Sptr transform = canvas6->Add<RectTransform>();
 			transform->SetMin({ 100, 100 });
 			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
+			transform->SetPosition(glm::vec2(400.0f, 400.0f));
 
 			GuiPanel::Sptr canPanel = canvas6->Add<GuiPanel>();
 			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
@@ -2068,82 +1369,12 @@ void DefaultSceneLayer::_CreateScene()
 
 			}
 			canvas6->AddChild(subPanel4);
-			//uiParent->AddChild(canvas6);
+			uiParent->AddChild(canvas6);
 		}
 
-		GameObject::Sptr canvas7 = scene->CreateGameObject("Highscores Menu");
-		{
-			RectTransform::Sptr transform = canvas7->Add<RectTransform>();
-			transform->SetMin({ 100, 100 });
-			transform->SetMax({ 700, 800 });
-			transform->SetPosition(glm::vec2(960.0f, 400.0f));
 
-			GuiPanel::Sptr canPanel = canvas7->Add<GuiPanel>();
-			canPanel->SetColor(glm::vec4(0.6f, 0.3f, 0.0f, 1.0f));
 
-			GameObject::Sptr subPanel1 = scene->CreateGameObject("Button11");
-			{
-				RectTransform::Sptr transform = subPanel1->Add<RectTransform>();
-				transform->SetMin({ 10, 10 });
-				transform->SetMax({ 590, 128 });
-				transform->SetPosition(glm::vec2(300.0f, 600.0f));
-
-				GuiPanel::Sptr panel = subPanel1->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(0.3f, 0.15f, 0.0f, 1.0f));
-
-				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
-				font->Bake();
-
-				GuiText::Sptr text = subPanel1->Add<GuiText>();
-				text->SetText("Back");
-				text->SetFont(font);
-
-			}
-			canvas7->AddChild(subPanel1);
-
-			GameObject::Sptr subPanel2 = scene->CreateGameObject("Highscores Title");
-			{
-				RectTransform::Sptr transform = subPanel2->Add<RectTransform>();
-				transform->SetMin({ 10, 10 });
-				transform->SetMax({ 590, 128 });
-				transform->SetPosition(glm::vec2(300.0f, 100.0f));
-
-				GuiPanel::Sptr panel = subPanel2->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-
-				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
-				font->Bake();
-
-				GuiText::Sptr text = subPanel2->Add<GuiText>();
-				text->SetText("Highscores");
-				text->SetFont(font);
-
-			}
-			canvas7->AddChild(subPanel2);
-
-			GameObject::Sptr subPanel3 = scene->CreateGameObject("Score Display");
-			{
-				RectTransform::Sptr transform = subPanel3->Add<RectTransform>();
-				transform->SetMin({ 10, 10 });
-				transform->SetMax({ 590, 354 });
-				transform->SetPosition(glm::vec2(300.0f, 350.0f));
-
-				GuiPanel::Sptr panel = subPanel3->Add<GuiPanel>();
-				panel->SetColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-				Font::Sptr font = ResourceManager::CreateAsset<Font>("fonts/Roboto-Medium.ttf", 36.0f);
-				font->Bake();
-
-				GuiText::Sptr text = subPanel3->Add<GuiText>();
-				text->SetText("");
-				text->SetFont(font);
-
-			}
-			canvas7->AddChild(subPanel3);
-			//uiParent->AddChild(canvas2);
-		}
-
-		
+		*/
 #pragma endregion
 
 #pragma region Commented Defaults

@@ -14,7 +14,6 @@ InspectorWindow::InspectorWindow() :
 	ParentName     = "Hierarchy";
 	SplitDirection = ImGuiDir_::ImGuiDir_Down;
 	SplitDepth     = 0.5f;
-	Open = false;
 }
 InspectorWindow::~InspectorWindow() = default;
 

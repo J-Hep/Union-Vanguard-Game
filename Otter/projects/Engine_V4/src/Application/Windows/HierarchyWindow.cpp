@@ -10,7 +10,6 @@ HierarchyWindow::HierarchyWindow() :
 	Name           = "Hierarchy";
 	SplitDirection = ImGuiDir_::ImGuiDir_Right;
 	SplitDepth     = 0.2f;
-	Open = false;
 }
 
 HierarchyWindow::~HierarchyWindow() = default;

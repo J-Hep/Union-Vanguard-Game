@@ -11,6 +11,8 @@ void EnemyMovement::Awake()
 		std::cout << "ENemy is not enabled\n";
 		IsEnabled = false;
 	}
+	_isSpawned = false;
+	//initPos = _gameObject->GetPosition();
 }
 
 void EnemyMovement::RenderImGui() {
@@ -41,23 +43,39 @@ EnemyMovement::Sptr EnemyMovement::FromJson(const nlohmann::json& blob) {
 }
 
 void EnemyMovement::Update(float deltaTime) {
-	//get position, move towards origin
-	glm::vec3 direction = -GetGameObject()->GetPosition();
-	//Enemy spawn locations
-	glm::vec3 pathPositions[] = {glm::vec3(40.f,0.f,0.f),glm::vec3(-40.f,0.f,0.f),glm::vec3(0.f,40.f,0.f),glm::vec3(0.f,-40.f,0.f)};
+	if (_isSpawned == true) {
+		//get position, move towards origin
+		glm::vec3 direction = -GetGameObject()->GetPosition();
+		//Enemy spawn locations
+		glm::vec3 pathPositions[] = {glm::vec3(40.f,0.f,0.f),glm::vec3(-40.f,0.f,0.f),glm::vec3(0.f,40.f,0.f),glm::vec3(0.f,-40.f,0.f)};
 
 
 
-	direction = glm::normalize(direction);
-	_body->SetLinearVelocity(direction);
+		direction = glm::normalize(direction);
+		_body->SetLinearVelocity(direction);
+	}
 }
 
 void EnemyMovement::OnEnteredTrigger(const std::shared_ptr<Gameplay::Physics::TriggerVolume>& trigger) {
-	//increase score here
 	
-	_body->GetGameObject()->GetScene()->RemoveGameObject(_gameObject);
 }
+
+void EnemyMovement::OnTriggerVolumeEntered(const std::shared_ptr<Gameplay::Physics::RigidBody>& body) {
+	//increase score here
+	std::cout << "GOBLIN DIEDED!!!\n";
+	_isSpawned = false;
+	//_gameObject->SetPostion(initPos);
+}
+
 
 void EnemyMovement::setGameObject(Gameplay::GameObject::Sptr object) {
 	_gameObject = object;
+}
+
+void EnemyMovement::setIsSpawned(bool value) {
+	_isSpawned = value;
+}
+
+bool EnemyMovement::getIsSpawned() {
+	return _isSpawned;
 }
