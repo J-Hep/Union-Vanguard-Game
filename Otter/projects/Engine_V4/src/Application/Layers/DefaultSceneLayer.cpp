@@ -1006,9 +1006,10 @@ void DefaultSceneLayer::_CreateScene()
 
 #pragma endregion
 
-#pragma region Lights Camera Action
+#pragma region Lights Camera Action Particle
 		// Create some lights for our scene
 		GameObject::Sptr lightParent = scene->CreateGameObject("Lights");
+		GameObject::Sptr ParticleParent = scene->CreateGameObject("Particle Parent");
 
 		GameObject::Sptr mainLight = scene->CreateGameObject("mainLight");
 		mainLight->SetPostion(glm::vec3(0.0f,0.0f,10.0f));
@@ -1032,6 +1033,9 @@ void DefaultSceneLayer::_CreateScene()
 			lightComponent->SetRadius(glm::linearRand(0.1f, 10.0f));
 			lightComponent->SetIntensity(glm::linearRand(1.0f, 2.0f));
 		}
+
+	
+	
 
 		// Set up the scene's camera
 		GameObject::Sptr camera = scene->MainCamera->GetGameObject()->SelfRef();
@@ -2354,15 +2358,18 @@ void DefaultSceneLayer::_CreateScene()
 
 			canvas->AddChild(subPanel);
 		}
-		
+		*/
 
-		GameObject::Sptr particles = scene->CreateGameObject("Particles");
-		{
-			ParticleSystem::Sptr particleManager = particles->Add<ParticleSystem>();  
-			particleManager->AddEmitter(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 10.0f), 10.0f, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)); 
-		}
+for (int i = 0; i < 1; i++) {
+	GameObject::Sptr particles = scene->CreateGameObject("Particles");
+	{
+		ParticleSystem::Sptr particleManager = particles->Add<ParticleSystem>();
+		particleManager->AddEmitter(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 10.0f), 10.0f, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		//ParticleParent->AddChild(particles);
+	}
+}
 
-	*/
+	
 
 #pragma endregion
 

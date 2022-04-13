@@ -11,7 +11,7 @@ uniform vec2 u_PixelSize;
 void main() {
     vec3 accumulator = vec3(0);
 
-    vec2 modifiedUV = floor(inUV * 200) / 200;
+    vec2 modifiedUV = floor(inUV * 400) / 400;
 
 
     outColor = texture(s_Image,modifiedUV).rgb;
