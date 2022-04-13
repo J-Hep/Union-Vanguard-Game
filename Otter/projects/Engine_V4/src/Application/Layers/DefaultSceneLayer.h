@@ -27,7 +27,7 @@ protected:
 	void _CreateScene();
 
 	//shooting variables
-	bool canShoot = false;
+	bool canShoot = true;
 	bool charging = false;
 	float shootPower = 0.f;
 	float powerLevel = 0.f;

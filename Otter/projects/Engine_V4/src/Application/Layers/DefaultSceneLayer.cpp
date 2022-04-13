@@ -120,7 +120,7 @@ void DefaultSceneLayer::BubbleSort(std::vector<int>& arr)
 double preFrame = glfwGetTime();
 bool uiStart = true;
 bool isButtonPressed = false;
-int menuSelect = 1, menuType = 1;
+int menuSelect = 1, menuType = 1, CurScore = 0;
 std::vector<int> scores;
 std::string score;
 	//menuType 1 = main menu
@@ -182,6 +182,9 @@ void DefaultSceneLayer::OnUpdate()
 		cameraOffseting.get()->GetRotation().z + 180));*/
 		
 
+	Gameplay::GameObject::Sptr cannonball = currScene->FindObjectByName("cannonBall");
+
+	Gameplay::GameObject::Sptr gob1 = currScene->FindObjectByName("goblin1");
 
 	if (uiStart == true)
 	{
@@ -482,31 +485,49 @@ void DefaultSceneLayer::OnUpdate()
 		isButtonPressed = false;
 	}
 	
-	if (InputEngine::GetKeyState(GLFW_KEY_SPACE) == ButtonState::Pressed && canShoot) {
-		//shoot then reset wait timer
-		if (shootPower < 70)
-		{
-			shootPower += dt * 20.0f;
+	if (currScene->IsPlaying == true)
+	{
+		if (InputEngine::GetKeyState(GLFW_KEY_V) == ButtonState::Down && canShoot) {
+			//shoot then reset wait timer
+
+			if (shootPower < 150)
+			{
+				shootPower += dt/90;
+			}
+			else
+			{
+				shootPower = 150.0f;
+			}
+			charging = true;
+			powerLevel = (shootPower / 70);
 		}
 		else
 		{
-			shootPower = 70.0f;
-		}
-		charging = true;
-		powerLevel = (shootPower / 70);
-	}
-	else
-	{
-		if (charging == true)
-		{
-			//spawn cannonball in the lane we're looking at
+			if (charging == true)
+			{
+				//spawn cannonball in the lane we're looking at
+				cannonball->SetPostion(glm::vec3(3.5f, 0.0f, 4.0f));
+				cannonball->Get<Gameplay::Physics::RigidBody>()->Awake();
+				cannonball->Get<Gameplay::Physics::RigidBody>()->ApplyImpulse(glm::vec3(shootPower, 0.0f, 15.0f));
+				
 
-			canShoot = false;
-			shootTimer = shootTime;
-			shootPower = 5.0f;
-			charging = false;
+				canShoot = false;
+				shootTimer = shootTime;
+				shootPower = 5.0f;
+				charging = false;
+			}
+		}
+		if (shootTimer <= 0) canShoot = true;
+		else shootTimer -= dt;
+
+		if (gob1->Get<TriggerVolumeEnterBehaviour>()->triggerEntered() == true)
+		{
+			CurScore += 10;
+			inGameScore->Get<GuiText>()->SetText(std::to_string(CurScore));
 		}
 	}
+	
+	
 }
 
 
@@ -1146,7 +1167,7 @@ void DefaultSceneLayer::_CreateScene()
 
 		GameObject::Sptr cannonBall = scene->CreateGameObject("cannonBall");
 		{
-			cannonBall->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
+			cannonBall->SetPostion(glm::vec3(0.0f, 0.0f, 0.0f));
 			cannonBall->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
 			cannonBall->SetScale(glm::vec3(1.f));
 
@@ -1251,6 +1272,7 @@ void DefaultSceneLayer::_CreateScene()
 			CylinderCollider::Sptr col = CylinderCollider::Create(glm::vec3(1.f, 1.f, 1.f));
 			volume->AddCollider(col);
 
+			
 			goblin1->Add<TriggerVolumeEnterBehaviour>();
 			goblin1->Add<EnemyMovement>();
 
@@ -1260,6 +1282,7 @@ void DefaultSceneLayer::_CreateScene()
 			// Add a dynamic rigid body to this monkey
 			RigidBody::Sptr physics = goblin1->Add<RigidBody>(RigidBodyType::Dynamic);
 			physics->AddCollider(ConvexMeshCollider::Create());
+			physics->SetAngularDamping(0.9f);
 
 			enemiesParent->AddChild(goblin1);
 
