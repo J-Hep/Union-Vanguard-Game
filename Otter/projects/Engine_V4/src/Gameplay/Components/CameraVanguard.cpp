@@ -35,16 +35,27 @@ void CameraVanguard::Update(float deltaTime)
 			
 			}
 
-			if (InputEngine::IsKeyDown(GLFW_KEY_A)) {
-				_cameraRotation += glm::vec3(0, 0, 90); // *delta time
-			
+			if (InputEngine::GetKeyState(GLFW_KEY_A) == ButtonState::Pressed) {
+				if (!_isButtonPressed) {
+					_cameraRotation += glm::vec3(0, 0, 90); // *delta time
+					GetGameObject()->SetRotation(GetGameObject()->GetRotation().x + _cameraRotation);
+				}
+				else {
+					_isButtonPressed = true;
+				}
 			}
-			if (InputEngine::IsKeyDown(GLFW_KEY_D)) {
-				_cameraRotation -= glm::vec3(0, 0, 90);
-		
+			if (InputEngine::GetKeyState(GLFW_KEY_D) == ButtonState::Pressed) {
+				if (!_isButtonPressed) {
+					_cameraRotation -= glm::vec3(0, 0, 90);
+					GetGameObject()->SetRotation(GetGameObject()->GetRotation().x + _cameraRotation);
+				}
+				else {
+					_isButtonPressed = true;
+				}
+				
 			}
 
-			GetGameObject()->SetRotation(GetGameObject()->GetRotation().x + _cameraRotation);
+			
 			
 	}
 }
