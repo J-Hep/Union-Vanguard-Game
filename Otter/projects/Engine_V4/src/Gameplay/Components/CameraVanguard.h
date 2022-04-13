@@ -29,6 +29,7 @@ protected:
 	//glm::dvec2 _prevMousePos;
 	//glm::vec2 _currentRot;
 	glm::vec3 _cameraRotation;
+	bool _isButtonPressed = false;
 	//int _cameraIteration;
 	//bool _isMousePressed = false;
 };
