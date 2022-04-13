@@ -192,6 +192,8 @@ void DefaultSceneLayer::OnUpdate()
 		loseMenu->SetEnabled(false);
 		highMenu->SetEnabled(false);
 		uiStart = false;
+		AudioEngine::playEvents("event:/Daytime Song");
+		AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 5, 0);
 	}
 	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
 	{
@@ -206,6 +208,8 @@ void DefaultSceneLayer::OnUpdate()
 			}
 			//possible pause sound effect could go here                                       <------------------ GABE LOOK HERE!!!!
 			isButtonPressed = true;
+			AudioEngine::playEvents("event:/Menu Pause");
+			AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 35, 0);
 		}
 	}
 	else
@@ -332,6 +336,7 @@ void DefaultSceneLayer::OnUpdate()
 				}
 			}
 			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Click");
 		}
 		isButtonPressed = true;
 	}
@@ -362,6 +367,7 @@ void DefaultSceneLayer::OnUpdate()
 				}
 			}
 			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Click");
 		}
 		isButtonPressed = true;
 	}
@@ -370,6 +376,7 @@ void DefaultSceneLayer::OnUpdate()
 		if (!isButtonPressed)
 		{
 			//button click sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Press");
 			//main menu
 			if (menuType == 1)
 			{
@@ -380,7 +387,7 @@ void DefaultSceneLayer::OnUpdate()
 					inGame->RenderGUI();
 					menuType = 3;
 					currScene->IsPlaying = true;
-					AudioEngine::playEvents("event:/Daytime Song");
+					AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 15, 0);
 				}
 				if (menuSelect == 2)
 				{
