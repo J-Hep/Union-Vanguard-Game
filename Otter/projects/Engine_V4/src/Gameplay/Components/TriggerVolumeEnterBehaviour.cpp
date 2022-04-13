@@ -29,3 +29,8 @@ TriggerVolumeEnterBehaviour::Sptr TriggerVolumeEnterBehaviour::FromJson(const nl
 	TriggerVolumeEnterBehaviour::Sptr result = std::make_shared<TriggerVolumeEnterBehaviour>();
 	return result;
 }
+
+bool TriggerVolumeEnterBehaviour::triggerEntered()
+{
+	return _playerInTrigger;
+}
