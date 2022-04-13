@@ -515,6 +515,7 @@ void DefaultSceneLayer::OnUpdate()
 				shootTimer = shootTime;
 				shootPower = 5.0f;
 				charging = false;
+				AudioEngine::playEvents("event:/Cannon");
 			}
 		}
 		if (shootTimer <= 0) canShoot = true;
