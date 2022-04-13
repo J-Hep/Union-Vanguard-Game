@@ -1,0 +1,14 @@
+{2a74e11f-8348-4d73-a158-600b26f835dc} bank:/Background_Music
+{ff71eb2d-7536-4a61-a93a-c6b84843daff} bank:/Enemy Sounds
+{635572cd-bd2c-4a0e-810d-30f718991f66} bank:/Environment
+{d1e3ecee-7005-44a0-8c1a-03bc401d6281} bank:/Master
+{49fecc3a-017e-08e2-0a53-8942b1ee6419} bank:/Master.strings
+{ecf6e20a-dff2-4e06-966f-13868b6a81dc} bus:/
+{b3ae93e2-52a5-4dce-bbe3-e388dffbbff5} bus:/Reverb
+{9d5f5564-3e7b-41cd-a4c8-258705280d86} event:/Cannon
+{68575e9c-c55b-4d6f-8212-395600801cbf} event:/Daytime Song
+{8d8aa190-0d8e-4f35-b31c-4b6f8c347059} event:/Goblin Attack
+{07decc74-52c0-4599-b586-9fe0cf228636} event:/Goblin Die
+{ec5cfee7-b5e8-41f2-8b2a-39d4a3fab715} event:/Growls
+{42e9e659-656a-4942-b792-d0bde4b6b5e2} event:/Menu Click
+{922b024c-257d-4b60-a527-c73949b0e76c} parameter:/Location

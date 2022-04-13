@@ -181,8 +181,10 @@ namespace ToneFire {
 			const Listener& listener = Listener());
 		~FMODStudio();
 
+		void SetListenerPos(float x, float y, float z);
 		void Update();
-		void LoadBank(const std::string& bankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags = FMOD_STUDIO_LOAD_BANK_NORMAL);
+		void LoadBank(const std::string& bankName,
+			FMOD_STUDIO_LOAD_BANK_FLAGS flags = FMOD_STUDIO_LOAD_BANK_NORMAL);
 	private:
 
 		FMOD::Studio::EventDescription* _GetEventDescription(const std::string& eventName);

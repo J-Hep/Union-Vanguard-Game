@@ -18,6 +18,9 @@ public:
 	void shutdown();
 	void studioshutdown();
 
+	static void AudioEngine::setListenerPos(float x, float y, float z);
+
+
 	void loadSound(const std::string& soundName, const std::string& filename, bool b3d, bool bLooping = false, bool bStream = false);
 	static void loadBanks();
 	void unloadSound(const std::string& soundName);
@@ -25,7 +28,8 @@ public:
 	static void playEvents(const std::string& eventname);
 	static void stopEvents(const std::string& eventname);
 	static void EventPosChanges(const std::string& eventname, float x, float y, float z);
-	static void EventParamChanges(const std::string& eventname, std::string& paramname, float x, float y);
+	static void EventParamChanges(const std::string& eventname,const std::string& paramname, float x, float y);
+	//static void EventVolumeChange(const std::string& eventname, float volume);
 	void playSoundByName(const std::string& soundName);
 	static ToneFire::FMODStudio studio;
 	static ToneFire::StudioSound audio;
