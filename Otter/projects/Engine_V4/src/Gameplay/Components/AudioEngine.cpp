@@ -26,8 +26,7 @@ int AudioEngine::ErrorCheck(FMOD_RESULT result)
 
 void AudioEngine::studioinit()
 {
-
-
+	return;
 }
 
 void AudioEngine::studioupdate()
@@ -66,13 +65,18 @@ void AudioEngine::loadSound(const std::string& soundName, const std::string& fil
 }
 
 
-
 void AudioEngine::loadBanks()
 {
 	studio.LoadBank("Master.bank");
 	studio.LoadBank("Master.strings.bank");
 	studio.LoadBank("Background_Music.bank");
 	studio.LoadBank("Enemy_Sounds.bank");
+	studio.LoadBank("Environment.bank");
+	studio.LoadBank("Menu.bank");
+}
+
+void AudioEngine::setListenerPos(float x, float y, float z) {
+	studio.SetListenerPos(-x, -z, y);
 }
 
 void AudioEngine::unloadSound(const std::string& soundName)
@@ -88,9 +92,13 @@ void AudioEngine::unloadSound(const std::string& soundName)
 void AudioEngine::loadEvents()
 {
 	audio.LoadEvent("event:/Daytime Song");
-	audio.LoadEvent("event:/Goblin");
+	audio.LoadEvent("event:/Goblin Attack");
 	audio.LoadEvent("event:/Growls");
-	
+	audio.LoadEvent("event:/Cannon");
+	audio.LoadEvent("event:/Menu Click");
+	audio.LoadEvent("event:/Goblin Die");
+	audio.LoadEvent("event:/Menu Pause");
+	audio.LoadEvent("event:/Menu Press");
 }
 
 void AudioEngine::playEvents(const std::string& eventname)
@@ -105,13 +113,18 @@ void AudioEngine::stopEvents(const std::string& eventname)
 
 void AudioEngine::EventPosChanges(const std::string& eventname, float x, float y, float z)
 {
-	audio.SetEventPosition(eventname, FMOD_VECTOR{ x, y, z });
+	audio.SetEventPosition(eventname, FMOD_VECTOR{ -x, -z, y });
 }
 
-void AudioEngine::EventParamChanges(const std::string& eventname, std::string& paramname, float x, float y)
+void AudioEngine::EventParamChanges(const std::string& eventname,const std::string& paramname, float x, float y)
 {
 	audio.SetEventParameter(eventname, paramname, x);
 }
+
+//void AudioEngine::EventVolumeChange(const std::string& eventname, float volume)
+//{
+//	audio.SetEventVolume(eventname, volume);
+//}
 
 void AudioEngine::playSoundByName(const std::string& soundName)
 {

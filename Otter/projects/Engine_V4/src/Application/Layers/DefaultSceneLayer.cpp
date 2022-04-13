@@ -171,6 +171,17 @@ void DefaultSceneLayer::OnUpdate()
 	Gameplay::GameObject::Sptr highMenuScore = currScene->FindObjectByName("Score Display");
 	Gameplay::GameObject::Sptr highMenuB1 = currScene->FindObjectByName("Button11");
 
+
+	Gameplay::GameObject::Sptr mainCameraStuff = currScene->FindObjectByName("Main Camera");
+	Gameplay::GameObject::Sptr CannonBarreling = currScene->FindObjectByName("Cannon Barrel");
+	Gameplay::GameObject::Sptr cameraOffseting = currScene->FindObjectByName("Camera Offset");
+	
+	/*CannonBarreling->SetRotation(glm::vec3(
+		90,  //90
+		-30,    //-30 
+		cameraOffseting.get()->GetRotation().z + 180));*/
+		
+
 	Gameplay::GameObject::Sptr cannonball = currScene->FindObjectByName("cannonBall");
 
 	Gameplay::GameObject::Sptr gob1 = currScene->FindObjectByName("goblin1");
@@ -184,6 +195,8 @@ void DefaultSceneLayer::OnUpdate()
 		loseMenu->SetEnabled(false);
 		highMenu->SetEnabled(false);
 		uiStart = false;
+		AudioEngine::playEvents("event:/Daytime Song");
+		AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 5, 0);
 	}
 	if (InputEngine::GetKeyState(GLFW_KEY_P) == ButtonState::Pressed)
 	{
@@ -198,6 +211,8 @@ void DefaultSceneLayer::OnUpdate()
 			}
 			//possible pause sound effect could go here                                       <------------------ GABE LOOK HERE!!!!
 			isButtonPressed = true;
+			AudioEngine::playEvents("event:/Menu Pause");
+			AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 35, 0);
 		}
 	}
 	else
@@ -324,6 +339,7 @@ void DefaultSceneLayer::OnUpdate()
 				}
 			}
 			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Click");
 		}
 		isButtonPressed = true;
 	}
@@ -354,6 +370,7 @@ void DefaultSceneLayer::OnUpdate()
 				}
 			}
 			//button select sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Click");
 		}
 		isButtonPressed = true;
 	}
@@ -362,6 +379,7 @@ void DefaultSceneLayer::OnUpdate()
 		if (!isButtonPressed)
 		{
 			//button click sound goes here                                       <------------------ GABE LOOK HERE!!!!
+			AudioEngine::playEvents("event:/Menu Press");
 			//main menu
 			if (menuType == 1)
 			{
@@ -372,7 +390,7 @@ void DefaultSceneLayer::OnUpdate()
 					inGame->RenderGUI();
 					menuType = 3;
 					currScene->IsPlaying = true;
-					AudioEngine::playEvents("event:/Daytime Song");
+					AudioEngine::EventParamChanges("event:/Daytime Song", "parameter:/Location", 15, 0);
 				}
 				if (menuSelect == 2)
 				{
@@ -1082,11 +1100,14 @@ void DefaultSceneLayer::_CreateScene()
 		GameObject::Sptr gameObjectsParent = scene->CreateGameObject("Game Objects");
 		GameObject::Sptr enemiesParent = scene->CreateGameObject("Enemies");
 		GameObject::Sptr uiParent = scene->CreateGameObject("UI");
-		GameObject::Sptr cannonParent = scene->CreateGameObject("CannonParts");
+		//GameObject::Sptr cannonParent = scene->CreateGameObject("Cannon Parts");
+		
+			//cannonParent->SetRotation(glm::vec3(90,0,0));
+		
 
 		cameraOffset->AddChild(camera);
 		gameObjectsParent->AddChild(enemiesParent);
-		gameObjectsParent->AddChild(cannonParent);
+	//	gameObjectsParent->AddChild(cannonParent);
 		
 
 		// Set up all our sample objects
@@ -1167,20 +1188,20 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 		GameObject::Sptr cannonBarrel = scene->CreateGameObject("Cannon Barrel"); {
-			cannonBarrel->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
-			cannonBarrel->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+			cannonBarrel->SetPostion(glm::vec3(0.6f, 0.0f, 1.0f));
+			cannonBarrel->SetRotation(glm::vec3(90.0f, -30.0f, -180.0f));
 			cannonBarrel->SetScale(glm::vec3(1.f));
 
 			RenderComponent::Sptr renderer = cannonBarrel->Add<RenderComponent>();
 			renderer->SetMesh(cannonBarrelMesh);
 			renderer->SetMaterial(cannonBarrelMaterial); //needs
 
-			cannonParent->AddChild(cannonBarrel);
+			cameraOffset->AddChild(cannonBarrel);
 		};
 
-		GameObject::Sptr cannonBase = scene->CreateGameObject("Cannon Base"); {
-			cannonBase->SetPostion(glm::vec3(12.6f, -10.4f, 1.0f));
-			cannonBase->SetRotation(glm::vec3(90.0f, 0.0f, 0.0f));
+		/*GameObject::Sptr cannonBase = scene->CreateGameObject("Cannon Base"); {
+			cannonBase->SetPostion(glm::vec3(-0.350f, 0.0f, 3.0f));
+			cannonBase->SetRotation(glm::vec3(0.0f, 115.0f, 0.0f));
 			cannonBase->SetScale(glm::vec3(1.f));
 
 			RenderComponent::Sptr renderer = cannonBase->Add<RenderComponent>();
@@ -1188,7 +1209,7 @@ void DefaultSceneLayer::_CreateScene()
 			renderer->SetMaterial(cannonBaseMaterial); //needs
 
 			cannonParent->AddChild(cannonBase);
-		};
+		};*/
 
 		GameObject::Sptr towerCannon = scene->CreateGameObject("towerCannon");
 		{
